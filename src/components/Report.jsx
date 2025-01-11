@@ -3,6 +3,7 @@ import axios from "axios";
 import mpi from "../assets/mpi.png";
 import Nav from "../components/Nav";
 import Select from "react-select";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { jsPDF } from "jspdf";
 
 const Report = () => {
@@ -477,7 +478,18 @@ const Report = () => {
 
           {/* If transactions are loading, show a loading indicator */}
           {loading ? (
-            <div className="text-center mt-10">Loading...</div>
+            <div className="flex justify-center items-center w-full h-96">
+            {/* Loading Animation */}
+            <div className="flex flex-col items-center">
+              <AiOutlineLoading3Quarters
+                className="text-purple-600 animate-spin text-6xl mb-4"
+                aria-label="Loading spinner"
+              />
+              <p className="text-lg text-gray-700 font-semibold">
+                Loading Analytics...
+              </p>
+            </div>
+          </div>
           ) : (
             <div className="flex flex-col overflow-clip mt-10 mx-auto max-w-7xl h-96">
               {/* Check if there are transactions */}

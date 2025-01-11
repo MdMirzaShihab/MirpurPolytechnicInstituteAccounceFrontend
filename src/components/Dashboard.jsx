@@ -112,9 +112,8 @@ const Dashboard = () => {
 
         {/* Content Area */}
         <div className="p-6 overflow-y-scroll grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {/* If analytics is still loading, show a loading animation */}
           {!analytics ? (
-            <div className="flex justify-center items-center h-full">
+            <div className="flex justify-center items-center h-full w-full">
               {/* Loading Animation */}
               <div className="flex flex-col items-center">
                 <AiOutlineLoading3Quarters
