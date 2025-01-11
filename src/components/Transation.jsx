@@ -55,7 +55,7 @@ const Transation = () => {
     try {
       const response = await axios.get(url);
       setter(response.data.transactions || []);
-      totalSetter(response.data[totalKey] || 0); // Use the provided key to set the total
+      totalSetter(response.data[totalKey] || 0); 
     } catch (error) {
       console.error(`Error fetching data from ${url}:`, error);
     }
@@ -68,13 +68,13 @@ const Transation = () => {
           "http://localhost:5000/api/today-reports/debits/today",
           setDebitAccounts,
           setTotalDebit,
-          "totalDebit" // Pass the key for debit total
+          "totalDebit"
         ),
         fetchData(
           "http://localhost:5000/api/today-reports/credits/today",
           setCreditAccounts,
           setTotalCredit,
-          "totalCredit" // Pass the key for credit total
+          "totalCredit"
         ),
       ]);
     };

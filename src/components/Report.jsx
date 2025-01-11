@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import mpi from "../assets/mpi.png";
 import Nav from "../components/Nav";
 import Select from "react-select";
 import { jsPDF } from "jspdf";
@@ -20,6 +21,7 @@ const Report = () => {
   const [error, setError] = useState("");
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
+  const [totalBalance, setTotalBalance] = useState(0);
 
   const REPORT_API = "http://localhost:5000/api/reports";
   const CATEGORY_API = "http://localhost:5000/api/categories";
@@ -31,7 +33,6 @@ const Report = () => {
       try {
         const categoryResponse = await axios.get(CATEGORY_API);
         const paymentMethodResponse = await axios.get(PAYMENT_METHOD_API);
-
         setCategories(categoryResponse.data);
         setPaymentMethods(paymentMethodResponse.data);
       } catch (error) {
@@ -68,10 +69,12 @@ const Report = () => {
           search: filters.search,
         },
       });
-      const { transactions, totalDebit, totalCredit } = response.data;
+      const { transactions, totalDebit, totalCredit, totalBalance } =
+        response.data;
       setTransactions(transactions);
       setTotalDebit(totalDebit);
       setTotalCredit(totalCredit);
+      setTotalBalance(totalBalance);
     } catch (error) {
       setError("Error fetching report data. Please try again.");
     } finally {
@@ -95,6 +98,11 @@ const Report = () => {
         label: category.name,
       }));
 
+  const paymentMethodOptions = paymentMethods.map((method) => ({
+    value: method._id,
+    label: method.name,
+  }));
+
   const typeOptions = [
     { value: "credit", label: "Credit" },
     { value: "debit", label: "Debit" },
@@ -104,70 +112,49 @@ const Report = () => {
     const doc = new jsPDF("landscape");
 
     const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    let startY = 10; // Starting Y position for the content
+    let pageNumber = 1;
+
+    // Add the MPI logo
+    const logoWidth = 20; // Width of the logo
+    const logoHeight = 20; // Height of the logo
+    const logoX = (pageWidth - logoWidth) / 2; // Center the logo horizontally
+
+    doc.addImage(mpi, "PNG", logoX, startY, logoWidth, logoHeight);
+    startY += logoHeight + 10; // Add some space after the logo
 
     // Company Info Section
     const companyName = "MIRPUR POLYTECHNIC INSTITUTE";
     const companyAddress =
       "Mukto Bangla Shopping Complex, Mirpur-1, Dhaka-1216";
+    const documentHeader =
+      "Consolidated Statement of Credit-Debit (Academinic)";
 
     // Set the company name to a larger, bold font
-    doc.setFont("helvetica", "bold"); // Set font to bold
-    doc.setFontSize(20); // Increase font size for company name
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
     const companyNameWidth = doc.getTextWidth(companyName);
-    doc.text(companyName, (pageWidth - companyNameWidth) / 2, 20); // Centering company name
+    doc.text(companyName, (pageWidth - companyNameWidth) / 2, startY);
+    startY += 6;
 
     // Set a smaller, regular font for the address
-    doc.setFont("helvetica", "normal"); // Regular font for the address
-    doc.setFontSize(14); // Set font size for the address
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
     const companyAddressWidth = doc.getTextWidth(companyAddress);
-    doc.text(companyAddress, (pageWidth - companyAddressWidth) / 2, 30); // Centering company address
+    doc.text(companyAddress, (pageWidth - companyAddressWidth) / 2, startY);
+    startY += 10;
 
+    // Set the company name to a larger, bold font
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    const documentHeaderWidth = doc.getTextWidth(documentHeader);
+    doc.text(documentHeader, (pageWidth - documentHeaderWidth) / 2, startY);
+    startY += 10;
 
     // Add some space before the summary table
-    let startY = 40;
-  
-    // Total Debit and Credit Table
-    const summaryHeaders = ["Total Debit", "Total Credit"];
-    const summaryData = [
-      `${totalDebit.toLocaleString("en-GB")}`,
-      `${totalCredit.toLocaleString("en-GB")}`,
-    ];
-  
-    const summaryCellWidth = 60;
-    const summaryCellHeight = 10;
-    const summaryStartX = (pageWidth - summaryHeaders.length * summaryCellWidth) / 2;
-  
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-  
-    // Draw Summary Headers
-    summaryHeaders.forEach((header, index) => {
-      const xPos = summaryStartX + index * summaryCellWidth;
-      doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
-      doc.text(
-        header,
-        xPos + (summaryCellWidth - doc.getTextWidth(header)) / 2,
-        startY + 6
-      );
-    });
-  
-    // Draw Summary Data
-    startY += summaryCellHeight;
-    doc.setFont("helvetica", "normal");
-    summaryData.forEach((data, index) => {
-      const xPos = summaryStartX + index * summaryCellWidth;
-      doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
-      doc.text(
-        data,
-        xPos + (summaryCellWidth - doc.getTextWidth(data)) / 2,
-        startY + 6
-      );
-    });
-
-
-
-    // Add some space before the transaction table
-    startY += summaryCellHeight + 10;
+    startY += 10;
 
     // Transaction Table Header
     const headers = [
@@ -181,8 +168,7 @@ const Report = () => {
     const headerSpacing = 40; // Spacing between each column
     const cellHeight = 10; // Height of each cell
 
-    // Calculate the startX for each header (distribute evenly across the page)
-    const headerWidths = headers.map((header) => doc.getTextWidth(header));
+    // Calculate the total width of the header (using headerSpacing)
     const totalWidth = headerSpacing * headers.length;
     const startX = (pageWidth - totalWidth) / 2; // Start position for the table
 
@@ -191,10 +177,11 @@ const Report = () => {
     doc.setFontSize(12); // Set font size for the headers
     headers.forEach((header, index) => {
       const xPos = startX + index * headerSpacing;
-      const headerWidth = headerWidths[index];
+      const headerWidth = doc.getTextWidth(header);
       // Draw the header box
       doc.rect(xPos, startY, headerSpacing, cellHeight);
-      doc.text(header, xPos + (headerSpacing - headerWidth) / 2, startY + 6); // Center text inside the cell
+      // Center the header text inside the box
+      doc.text(header, xPos + (headerSpacing - headerWidth) / 2, startY + 6);
     });
 
     // Set the font to normal (non-bold) for the table rows
@@ -203,31 +190,117 @@ const Report = () => {
 
     // Table Rows
     startY += cellHeight; // Move down to the next row
-    transactions.forEach((transaction, index) => {
+    transactions.forEach((transaction, rowIndex) => {
       const rowData = [
         new Date(transaction.date).toLocaleDateString("en-GB"),
         transaction.type,
         transaction.category.name,
         transaction.paymentMethod.name,
         transaction.remarks || "N/A",
-        new Intl.NumberFormat("en-GB", {
-          style: "currency",
-          currency: "BDT",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(transaction.amount),
+        transaction.amount.toLocaleString("en-GB"),
       ];
 
-      rowData.forEach((data, index) => {
-        const xPos = startX + index * headerSpacing;
-        const dataWidth = doc.getTextWidth(data);
-        // Draw the cell box
-        doc.rect(xPos, startY, headerSpacing, cellHeight);
-        // Center the data inside the cell
-        doc.text(data, xPos + (headerSpacing - dataWidth) / 2, startY + 6);
+      // Calculate the maximum height required for the row
+      let rowHeight = cellHeight;
+      const wrappedRowData = rowData.map((data, index) => {
+        const cellWidth = headerSpacing - 4; // Slightly smaller to account for padding
+        const wrappedText = doc.splitTextToSize(data, cellWidth); // Wrap text to fit cell width
+        const requiredHeight = wrappedText.length * 6; // Estimate height (6px per line of text)
+        rowHeight = Math.max(rowHeight, requiredHeight); // Adjust row height for the tallest cell
+        return wrappedText; // Return wrapped text for drawing
       });
-      startY += cellHeight; // Move to the next row
+
+      // Draw the cells with the wrapped text
+      wrappedRowData.forEach((wrappedText, index) => {
+        const xPos = startX + index * headerSpacing;
+        doc.rect(xPos, startY, headerSpacing, rowHeight); // Draw the cell box
+        wrappedText.forEach((line, lineIndex) => {
+          const yPos = startY + 6 + lineIndex * 4; // Position each line within the cell
+          doc.text(line, xPos + 2, yPos); // Add padding inside the cell
+        });
+      });
+
+      startY += rowHeight; // Move to the next row
+
+      // Check if a new page is needed
+      if (startY + cellHeight > pageHeight - 30) {
+        doc.addPage();
+        startY = 30; // Reset startY after adding a new page
+        pageNumber++;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
+
+        // Re-draw headers on the new page
+        startY += 10;
+        doc.setFont("helvetica", "bold"); // Set headers to bold font
+        doc.setFontSize(12); // Set font size for the headers
+        headers.forEach((header, index) => {
+          const xPos = startX + index * headerSpacing;
+          const headerWidth = doc.getTextWidth(header);
+          // Draw the header box again
+          doc.rect(xPos, startY, headerSpacing, cellHeight);
+          // Center the header text inside the box
+          doc.text(
+            header,
+            xPos + (headerSpacing - headerWidth) / 2,
+            startY + 6
+          );
+        });
+        // Reset font for rows
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        startY += cellHeight; // Move to the next row after header
+      }
     });
+
+    // Add space before the summary table
+    startY += 10;
+
+    // Total Debit and Credit Table
+    const summaryHeaders = ["Total Debit", "Total Credit", "Total Balance"];
+    const summaryData = [
+      `${totalDebit.toLocaleString("en-GB")}`,
+      `${totalCredit.toLocaleString("en-GB")}`,
+      `${totalBalance.toLocaleString("en-GB")}`,
+    ];
+
+    const summaryCellWidth = headerSpacing * 2;
+    const summaryCellHeight = 10;
+    const summaryStartX =
+      (pageWidth - summaryHeaders.length * summaryCellWidth) / 2;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+
+    // Draw Summary Headers
+    summaryHeaders.forEach((header, index) => {
+      const xPos = summaryStartX + index * summaryCellWidth;
+      doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
+      doc.text(
+        header,
+        xPos + (summaryCellWidth - doc.getTextWidth(header)) / 2,
+        startY + 6
+      );
+    });
+
+    // Draw Summary Data
+    startY += summaryCellHeight;
+    doc.setFont("helvetica", "normal");
+    summaryData.forEach((data, index) => {
+      const xPos = summaryStartX + index * summaryCellWidth;
+      doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
+      doc.text(
+        data,
+        xPos + (summaryCellWidth - doc.getTextWidth(data)) / 2,
+        startY + 6
+      );
+    });
+
+    // Final page footer
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
 
     // Save the PDF
     doc.save("transaction_report.pdf");
@@ -285,8 +358,10 @@ const Report = () => {
                   Payment Method
                 </label>
                 <Select
-                  options={paymentMethods}
-                  value={filters.paymentMethod}
+                  options={paymentMethodOptions}
+                  value={paymentMethodOptions.find(
+                    (option) => option.value === filters.paymentMethod
+                  )}
                   onChange={(selectedOption) =>
                     handleSelectChange("paymentMethod", selectedOption)
                   }
@@ -381,13 +456,21 @@ const Report = () => {
                   ৳ {totalCredit.toLocaleString()}
                 </p>
               </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-700">
+                  Total Balance:
+                </h3>
+                <p className="text-lg font-bold text-yellow-600">
+                  ৳ {totalBalance.toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Transactions Table */}
           {error && <div className="text-red-500 mt-4">{error}</div>}
-          <div className="overflow-x-auto mt-10 mx-auto max-w-7xl">
-            <table className="min-w-full bg-white">
+          <div className="flex flex-col overflow-clip mt-10 mx-auto max-w-7xl h-96">
+            <table className="w-full table-fixed bg-white">
               <thead className="bg-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
@@ -410,31 +493,37 @@ const Report = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {transactions.map((transaction) => (
-                  <tr key={transaction._id} className="bg-white border-b">
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {new Date(transaction.date).toLocaleDateString("en-GB")}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {transaction.type}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {transaction.category.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {transaction.paymentMethod.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {transaction.remarks || "N/A"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      ৳ {transaction.amount.toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
             </table>
+            <div className="flex overflow-y-auto">
+              {" "}
+              {/* To make the tbody scrollable */}
+              <table className="w-full table-fixed">
+                <tbody>
+                  {transactions.map((transaction) => (
+                    <tr key={transaction._id} className="bg-white border-b">
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {new Date(transaction.date).toLocaleDateString("en-GB")}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {transaction.type}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {transaction.category.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {transaction.paymentMethod.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {transaction.remarks || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        ৳ {transaction.amount.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

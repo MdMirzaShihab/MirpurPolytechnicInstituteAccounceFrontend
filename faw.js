@@ -15,10 +15,6 @@ const Transation = () => {
 
   const [categories, setCategories] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [debitAccounts, setDebitAccounts] = useState([]);
-  const [creditAccounts, setCreditAccounts] = useState([]);
-  const [totalDebit, setTotalDebit] = useState(0);
-  const [totalCredit, setTotalCredit] = useState(0);
 
   useEffect(() => {
     // Fetch categories and payment methods on component mount
@@ -49,40 +45,6 @@ const Transation = () => {
 
     fetchData();
   }, [formData.type]);
-
-  // Fetch debit accounts data
-  useEffect(() => {
-    const fetchDebitAccounts = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/today-reports/debits/today"
-        );
-        setDebitAccounts(response.data.transactions || []);
-        setTotalDebit(response.data.totalDebit || 0);
-      } catch (error) {
-        console.error("Error fetching debit accounts:", error);
-      }
-    };
-
-    fetchDebitAccounts();
-  }, []);
-
-  // Fetch credit accounts data
-  useEffect(() => {
-    const fetchCreditAccounts = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/today-reports/credits/today"
-        );
-        setCreditAccounts(response.data.transactions || []);
-        setTotalCredit(response.data.totalCredit || 0);
-      } catch (error) {
-        console.error("Error fetching credit accounts:", error);
-      }
-    };
-
-    fetchCreditAccounts();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -122,18 +84,6 @@ const Transation = () => {
       alert("Failed to create transaction.");
     }
   };
-
-  const renderTableRows = (data) =>
-    data.map((transaction) => (
-      <tr
-        key={transaction._id}
-        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-        <td className="px-6 py-4">{transaction.category.name}</td>
-        <td className="px-6 py-4">{transaction.amount}</td>
-        <td className="px-6 py-4">{transaction.paymentMethod.name}</td>
-        <td className="px-6 py-4">Actions</td>
-      </tr>
-    ));
 
   const categoryOptions = categories
     .filter((cat) => cat.type.toLowerCase() === formData.type.toLowerCase())
@@ -284,73 +234,6 @@ const Transation = () => {
                 </div>
               </div>
             </form>
-          </div>
-          <div className="grid md:grid-cols-2 gap-5">
-            {/* Credit Accounts Table */}
-            <div>
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-white bg-red-500 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3">Account Head</th>
-                    <th className="px-6 py-3">Amount</th>
-                    <th className="px-6 py-3">Payment Method</th>
-                    <th className="px-6 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {creditAccounts.length > 0 ? (
-                    renderTableRows(creditAccounts)
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="text-center px-6 py-4">
-                        No credit accounts available
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan="3" className="px-6 py-4 font-bold">
-                      Total Credit
-                    </td>
-                    <td className="px-6 py-4 font-bold">{totalCredit}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            {/* Debit Accounts Table */}
-            <div>
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-white bg-blue-500 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3">Account Head</th>
-                    <th className="px-6 py-3">Amount</th>
-                    <th className="px-6 py-3">Payment Method</th>
-                    <th className="px-6 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {debitAccounts.length > 0 ? (
-                    renderTableRows(debitAccounts)
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="text-center px-6 py-4">
-                        No debit accounts available
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan="3" className="px-6 py-4 font-bold">
-                      Total Debit
-                    </td>
-                    <td className="px-6 py-4 font-bold">{totalDebit}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
           </div>
         </div>
       </div>
