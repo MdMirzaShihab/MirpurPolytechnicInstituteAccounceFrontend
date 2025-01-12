@@ -1,197 +1,363 @@
-const handlePrint = () => {
-  const doc = new jsPDF("landscape");
-
-  const pageWidth = doc.internal.pageSize.width;
-  const pageHeight = doc.internal.pageSize.height;
-
-  let startY = 10; // Starting Y position for the content
-  let pageNumber = 1;
-
-  // Add the MPI logo
-  const logoWidth = 20; // Width of the logo
-  const logoHeight = 20; // Height of the logo
-  const logoX = (pageWidth - logoWidth) / 2; // Center the logo horizontally
-
-  doc.addImage(mpi, "PNG", logoX, startY, logoWidth, logoHeight);
-  startY += logoHeight + 10; // Add some space after the logo
-
-  // Company Info Section
-  const companyName = "MIRPUR POLYTECHNIC INSTITUTE";
-  const companyAddress =
-    "Mukto Bangla Shopping Complex, Mirpur-1, Dhaka-1216";
-  const documentHeader =
-    "Consolidated Statement of Credit-Debit (Academinic)";
-
-  // Set the company name to a larger, bold font
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  const companyNameWidth = doc.getTextWidth(companyName);
-  doc.text(companyName, (pageWidth - companyNameWidth) / 2, startY);
-  startY += 6;
-
-  // Set a smaller, regular font for the address
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  const companyAddressWidth = doc.getTextWidth(companyAddress);
-  doc.text(companyAddress, (pageWidth - companyAddressWidth) / 2, startY);
-  startY += 10;
-
-  // Set the company name to a larger, bold font
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  const documentHeaderWidth = doc.getTextWidth(documentHeader);
-  doc.text(documentHeader, (pageWidth - documentHeaderWidth) / 2, startY);
-  startY += 10;
-
-  // Add some space before the summary table
-  startY += 10;
-
-  // Transaction Table Header
-  const headers = [
-    "Date",
-    "Type",
-    "Category",
-    "Payment Method",
-    "Remarks",
-    "Amount",
-  ];
-  const headerSpacing = 40; // Spacing between each column
-  const cellHeight = 10; // Height of each cell
-
-  // Calculate the total width of the header (using headerSpacing)
-  const totalWidth = headerSpacing * headers.length;
-  const startX = (pageWidth - totalWidth) / 2; // Start position for the table
-
-  // Draw Table Header (Bold)
-  doc.setFont("helvetica", "bold"); // Set headers to bold font
-  doc.setFontSize(12); // Set font size for the headers
-  headers.forEach((header, index) => {
-    const xPos = startX + index * headerSpacing;
-    const headerWidth = doc.getTextWidth(header);
-    // Draw the header box
-    doc.rect(xPos, startY, headerSpacing, cellHeight);
-    // Center the header text inside the box
-    doc.text(header, xPos + (headerSpacing - headerWidth) / 2, startY + 6);
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import Select from "react-select";
+import Nav from "../components/Nav";
+const Transation = () => {
+  const [formData, setFormData] = useState({
+    type: "",
+    category: "",
+    amount: "",
+    paymentMethod: "",
+    remarks: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
-  // Set the font to normal (non-bold) for the table rows
-  doc.setFont("helvetica", "normal"); // Reset font to normal
-  doc.setFontSize(10); // Ensure the row font size is the same as header size
+  const [categories, setCategories] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [debitAccounts, setDebitAccounts] = useState([]);
+  const [creditAccounts, setCreditAccounts] = useState([]);
+  const [totalDebit, setTotalDebit] = useState(0);
+  const [totalCredit, setTotalCredit] = useState(0);
+  const [filterSaveTrigger, setFilterSaveTrigger] = useState(0);
 
-  // Table Rows
-  startY += cellHeight; // Move down to the next row
-  transactions.forEach((transaction, rowIndex) => {
-    const rowData = [
-      new Date(transaction.date).toLocaleDateString("en-GB"),
-      transaction.type,
-      transaction.category.name,
-      transaction.paymentMethod.name,
-      transaction.remarks || "N/A",
-      transaction.amount.toLocaleString("en-GB"),
-    ];
-
-    // Calculate the maximum height required for the row
-    let rowHeight = cellHeight;
-    const wrappedRowData = rowData.map((data, index) => {
-      const cellWidth = headerSpacing - 4; // Slightly smaller to account for padding
-      const wrappedText = doc.splitTextToSize(data, cellWidth); // Wrap text to fit cell width
-      const requiredHeight = wrappedText.length * 6; // Estimate height (6px per line of text)
-      rowHeight = Math.max(rowHeight, requiredHeight); // Adjust row height for the tallest cell
-      return wrappedText; // Return wrapped text for drawing
-    });
-
-    // Draw the cells with the wrapped text
-    wrappedRowData.forEach((wrappedText, index) => {
-      const xPos = startX + index * headerSpacing;
-      doc.rect(xPos, startY, headerSpacing, rowHeight); // Draw the cell box
-      wrappedText.forEach((line, lineIndex) => {
-        const yPos = startY + 6 + lineIndex * 4; // Position each line within the cell
-        doc.text(line, xPos + 2, yPos); // Add padding inside the cell
-      });
-    });
-
-    startY += rowHeight; // Move to the next row
-
-    // Check if a new page is needed
-    if (startY + cellHeight > pageHeight - 30) {
-      doc.addPage();
-      startY = 30; // Reset startY after adding a new page
-      pageNumber++;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
-
-      // Re-draw headers on the new page
-      startY += 10;
-      doc.setFont("helvetica", "bold"); // Set headers to bold font
-      doc.setFontSize(12); // Set font size for the headers
-      headers.forEach((header, index) => {
-        const xPos = startX + index * headerSpacing;
-        const headerWidth = doc.getTextWidth(header);
-        // Draw the header box again
-        doc.rect(xPos, startY, headerSpacing, cellHeight);
-        // Center the header text inside the box
-        doc.text(
-          header,
-          xPos + (headerSpacing - headerWidth) / 2,
-          startY + 6
+  useEffect(() => {
+    // Fetch categories and payment methods on component mount
+    const fetchData = async () => {
+      try {
+        const categoryResponse = await axios.get(
+          "http://localhost:5000/api/categories"
         );
-      });
-      // Reset font for rows
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      startY += cellHeight; // Move to the next row after header
+        const paymentMethodResponse = await axios.get(
+          "http://localhost:5000/api/payment-methods"
+        );
+        setCategories(categoryResponse.data);
+        setPaymentMethods(paymentMethodResponse.data);
+
+        const cashPaymentMethod = paymentMethodResponse.data.find(
+          (method) => method.name.toLowerCase() === "cash"
+        );
+        if (cashPaymentMethod) {
+          setFormData((prevData) => ({
+            ...prevData,
+            paymentMethod: cashPaymentMethod._id, // set payment method to 'Cash'
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching categories or payment methods:", error);
+      }
+    };
+
+    fetchData();
+  }, [formData.type]);
+
+  const fetchData = async (url, setter, totalSetter, totalKey) => {
+    try {
+      const response = await axios.get(url);
+      setter(response.data.transactions || []);
+      totalSetter(response.data[totalKey] || 0); 
+    } catch (error) {
+      console.error(`Error fetching data from ${url}:`, error);
     }
-  });
+  };
 
-  // Add space before the summary table
-  startY += 10;
+  useEffect(() => {
+    const fetchAllData = async () => {
+      await Promise.all([
+        fetchData(
+          "http://localhost:5000/api/today-reports/debits/today",
+          setDebitAccounts,
+          setTotalDebit,
+          "totalDebit"
+        ),
+        fetchData(
+          "http://localhost:5000/api/today-reports/credits/today",
+          setCreditAccounts,
+          setTotalCredit,
+          "totalCredit"
+        ),
+      ]);
+    };
 
-  // Total Debit and Credit Table
-  const summaryHeaders = ["Total Debit", "Total Credit", "Total Balance"];
-  const summaryData = [
-    `${totalDebit.toLocaleString("en-GB")}`,
-    `${totalCredit.toLocaleString("en-GB")}`,
-    `${totalBalance.toLocaleString("en-GB")}`,
+    fetchAllData();
+  }, [filterSaveTrigger]);
+
+    const renderTableRows = (data) =>
+      data.map((transaction) => (
+        <tr
+          key={transaction._id}
+          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <td className="px-6 py-4">{transaction.category.name}</td>
+          <td className="px-6 py-4">{transaction.amount}</td>
+          <td className="px-6 py-4">{transaction.paymentMethod.name}</td>
+          <td className="px-6 py-4">Actions</td>
+        </tr>
+      ));
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "amount") {
+      setFormData({ ...formData, [name]: value ? parseFloat(value) : "" });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSelectChange = (selectedOption, name) => {
+    setFormData({
+      ...formData,
+      [name]: selectedOption ? selectedOption.value : "",
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/transactions",
+        formData
+      );
+      alert("Transaction created successfully!");
+      setFormData({
+        type: "",
+        category: "",
+        amount: "",
+        paymentMethod: "",
+        remarks: "",
+        date: new Date().toISOString().split("T")[0],
+      });
+      setFilterSaveTrigger((prev) => prev + 1);
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      alert("Failed to create transaction.");
+    }
+  };
+
+  const categoryOptions = categories
+    .filter((cat) => cat.type.toLowerCase() === formData.type.toLowerCase())
+    .map((cat) => ({
+      value: cat._id,
+      label: cat.name,
+    }));
+
+  const paymentMethodOptions = paymentMethods.map((method) => ({
+    value: method._id,
+    label: method.name,
+  }));
+
+  const typeOptions = [
+    { value: "credit", label: "Credit" },
+    { value: "debit", label: "Debit" },
   ];
 
-  const summaryCellWidth = headerSpacing * 2;
-  const summaryCellHeight = 10;
-  const summaryStartX =
-    (pageWidth - summaryHeaders.length * summaryCellWidth) / 2;
+  return (
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <div
+        className={` bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}>
+        <Nav />
+      </div>
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col ">
+        {/* Navbar */}
+        <div className="bg-purple-900 text-white px-4 py-2 flex justify-end items-center ">
+          <button className=" font-bold ">logout</button>
+        </div>
 
-  // Draw Summary Headers
-  summaryHeaders.forEach((header, index) => {
-    const xPos = summaryStartX + index * summaryCellWidth;
-    doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
-    doc.text(
-      header,
-      xPos + (summaryCellWidth - doc.getTextWidth(header)) / 2,
-      startY + 6
-    );
-  });
+        {/* Content Area */}
 
-  // Draw Summary Data
-  startY += summaryCellHeight;
-  doc.setFont("helvetica", "normal");
-  summaryData.forEach((data, index) => {
-    const xPos = summaryStartX + index * summaryCellWidth;
-    doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
-    doc.text(
-      data,
-      xPos + (summaryCellWidth - doc.getTextWidth(data)) / 2,
-      startY + 6
-    );
-  });
+        <div className="flex-1 p-4 bg-gray-200">
+          <div className="mx-auto max-w-7xl mt-10 bg-gray-100 shadow rounded">
+            <div className="bg-purple-900 p-2">
+              <h1 className="text-white font-bold text-center">Transation</h1>
+            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="grid md:grid-cols-6 p-5 gap-5">
+                <div className="col-span-1">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Accounts Type
+                  </label>
+                  <Select
+                    name="type"
+                    value={typeOptions.find(
+                      (option) => option.value === formData.type
+                    )}
+                    onChange={(selectedOption) =>
+                      handleSelectChange(selectedOption, "type")
+                    }
+                    options={typeOptions}
+                    placeholder="Select Type"
+                    required
+                    isSearchable
+                    className="w-full"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Accounts Head
+                  </label>
+                  <Select
+                    name="category"
+                    value={categoryOptions.find(
+                      (option) => option.value === formData.category
+                    )}
+                    onChange={(selectedOption) =>
+                      handleSelectChange(selectedOption, "category")
+                    }
+                    options={categoryOptions}
+                    placeholder="Select Head"
+                    isDisabled={!formData.type}
+                    isSearchable
+                    className="w-full"
+                    required
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Amount"
+                    name="amount"
+                    value={formData.amount || ""}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Payment Method
+                  </label>
+                  <Select
+                    placeholder="Payment Method"
+                    isSearchable
+                    className="w-full"
+                    name="paymentMethod"
+                    value={paymentMethodOptions.find(
+                      (option) => option.value === formData.paymentMethod
+                    )}
+                    onChange={(selectedOption) =>
+                      handleSelectChange(selectedOption, "paymentMethod")
+                    }
+                    options={paymentMethodOptions}
+                    required
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="date"
+                    value={formData.date}
+                    onChange={(e) =>
+                      setFormData({ ...formData, date: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Your message
+                  </label>
+                  <textarea
+                    name="remarks"
+                    value={formData.remarks || ""}
+                    onChange={handleInputChange}
+                    rows="2"
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Write your thoughts here..."></textarea>
+                </div>
+                <div className="col-span-5 "></div>
+                <div className="col-span-1 ">
+                  <button
+                    type="submit"
+                    className="bg-green-500  ms-auto border border-gray-300 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    Save
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div className="grid md:grid-cols-2 max-w-7xl mx-auto gap-5 ">
+            {/* Credit Accounts Table */}
+            <div className="relative w-full max-w-7xl col-span-1 mt-10 mb-20 mx-auto ">
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-white bg-red-500 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-6 py-3">Account Head</th>
+                    <th className="px-6 py-3">Amount</th>
+                    <th className="px-6 py-3">Payment Method</th>
+                    <th className="px-6 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {creditAccounts.length > 0 ? (
+                    renderTableRows(creditAccounts)
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="text-center px-6 py-4">
+                        No credit accounts available
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan="3" className="px-6 py-4 font-bold">
+                      Total Credit
+                    </td>
+                    <td className="px-6 py-4 font-bold">{totalCredit}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
 
-  // Final page footer
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
+            {/* Debit Accounts Table */}
+            <div className="relative w-full max-w-7xl col-span-1 mt-10 mb-20 mx-auto overflow-x-auto">
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-white bg-blue-500 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-6 py-3">Account Head</th>
+                    <th className="px-6 py-3">Amount</th>
+                    <th className="px-6 py-3">Payment Method</th>
+                    <th className="px-6 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {debitAccounts.length > 0 ? (
+                    renderTableRows(debitAccounts)
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="text-center px-6 py-4">
+                        No debit accounts available
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan="3" className="px-6 py-4 font-bold">
+                      Total Debit
+                    </td>
+                    <td className="px-6 py-4 font-bold">{totalDebit}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
 
-  // Save the PDF
-  doc.save("transaction_report.pdf");
+            <div className="max-w-7xl mx-auto gap-5 flex justify-between"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
+
+export default Transation;

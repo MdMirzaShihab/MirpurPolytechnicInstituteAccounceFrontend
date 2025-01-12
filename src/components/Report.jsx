@@ -111,52 +111,52 @@ const Report = () => {
 
   const handlePrint = () => {
     const doc = new jsPDF("landscape");
-  
+
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
-  
+
     let startY = 10; // Starting Y position for the content
     let pageNumber = 1;
-  
+
     // Add the MPI logo
     const logoWidth = 20; // Width of the logo
     const logoHeight = 20; // Height of the logo
     const logoX = (pageWidth - logoWidth) / 2; // Center the logo horizontally
-  
+
     doc.addImage(mpi, "PNG", logoX, startY, logoWidth, logoHeight);
     startY += logoHeight + 10; // Add some space after the logo
-  
+
     // Company Info Section
     const companyName = "MIRPUR POLYTECHNIC INSTITUTE";
     const companyAddress =
       "Mukto Bangla Shopping Complex, Mirpur-1, Dhaka-1216";
     const documentHeader =
       "Consolidated Statement of Credit-Debit (Academinic)";
-  
+
     // Set the company name to a larger, bold font
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     const companyNameWidth = doc.getTextWidth(companyName);
     doc.text(companyName, (pageWidth - companyNameWidth) / 2, startY);
     startY += 6;
-  
+
     // Set a smaller, regular font for the address
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     const companyAddressWidth = doc.getTextWidth(companyAddress);
     doc.text(companyAddress, (pageWidth - companyAddressWidth) / 2, startY);
     startY += 10;
-  
+
     // Set the company name to a larger, bold font
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     const documentHeaderWidth = doc.getTextWidth(documentHeader);
     doc.text(documentHeader, (pageWidth - documentHeaderWidth) / 2, startY);
     startY += 10;
-  
+
     // Add some space before the summary table
     startY += 10;
-  
+
     // Transaction Table Header
     const headers = [
       "Date",
@@ -168,11 +168,11 @@ const Report = () => {
     ];
     const headerSpacing = 40; // Spacing between each column
     const cellHeight = 10; // Height of each cell
-  
+
     // Calculate the total width of the header (using headerSpacing)
     const totalWidth = headerSpacing * headers.length;
     const startX = (pageWidth - totalWidth) / 2; // Start position for the table
-  
+
     // Draw Table Header (Bold)
     doc.setFont("helvetica", "bold"); // Set headers to bold font
     doc.setFontSize(12); // Set font size for the headers
@@ -184,13 +184,16 @@ const Report = () => {
       // Center the header text inside the box
       doc.text(header, xPos + (headerSpacing - headerWidth) / 2, startY + 6);
     });
-  
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
     // Check if there are transactions, if not, display "No Data" message
     if (transactions.length === 0) {
       startY += cellHeight;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(12);
-      doc.text("No Data Available", (pageWidth - doc.getTextWidth("No Data Available")) / 2, startY + 6);
+      doc.text(
+        "No Data Available",
+        (pageWidth - doc.getTextWidth("No Data Available")) / 2,
+        startY + 6
+      );
     } else {
       // Table Rows
       startY += cellHeight; // Move down to the next row
@@ -203,7 +206,7 @@ const Report = () => {
           transaction.remarks || "N/A",
           transaction.amount.toLocaleString("en-GB"),
         ];
-  
+
         // Calculate the maximum height required for the row
         let rowHeight = cellHeight;
         const wrappedRowData = rowData.map((data, index) => {
@@ -213,19 +216,28 @@ const Report = () => {
           rowHeight = Math.max(rowHeight, requiredHeight); // Adjust row height for the tallest cell
           return wrappedText; // Return wrapped text for drawing
         });
-  
+
         // Draw the cells with the wrapped text
         wrappedRowData.forEach((wrappedText, index) => {
           const xPos = startX + index * headerSpacing;
           doc.rect(xPos, startY, headerSpacing, rowHeight); // Draw the cell box
+        
           wrappedText.forEach((line, lineIndex) => {
             const yPos = startY + 6 + lineIndex * 4; // Position each line within the cell
-            doc.text(line, xPos + 2, yPos); // Add padding inside the cell
+        
+            // Check if this is the "Amount" column
+            if (headers[index] === "Amount") {
+              const textWidth = doc.getTextWidth(line); // Calculate the text width
+              doc.text(line, xPos + headerSpacing - textWidth - 2, yPos); // Align right with padding
+            } else {
+              doc.text(line, xPos + 2, yPos); // Default left-aligned text
+            }
           });
         });
-  
+        
+
         startY += rowHeight; // Move to the next row
-  
+
         // Check if a new page is needed
         if (startY + cellHeight > pageHeight - 30) {
           doc.addPage();
@@ -234,7 +246,7 @@ const Report = () => {
           doc.setFont("helvetica", "normal");
           doc.setFontSize(10);
           doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
-  
+
           // Re-draw headers on the new page
           startY += 10;
           doc.setFont("helvetica", "bold"); // Set headers to bold font
@@ -258,10 +270,10 @@ const Report = () => {
         }
       });
     }
-  
+
     // Add space before the summary table
     startY += 10;
-  
+
     // Total Debit and Credit Table
     const summaryHeaders = ["Total Debit", "Total Credit", "Total Balance"];
     const summaryData = [
@@ -269,48 +281,45 @@ const Report = () => {
       `${totalCredit.toLocaleString("en-GB")}`,
       `${totalBalance.toLocaleString("en-GB")}`,
     ];
-  
-    const summaryCellWidth = headerSpacing * 2;
+
     const summaryCellHeight = 10;
-    const summaryStartX =
-      (pageWidth - summaryHeaders.length * summaryCellWidth) / 2;
-  
+    const summaryStartX = startX + headerSpacing * summaryHeaders.length;
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-  
+
     // Draw Summary Headers
     summaryHeaders.forEach((header, index) => {
-      const xPos = summaryStartX + index * summaryCellWidth;
-      doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
+      const xPos = summaryStartX + index * headerSpacing;
+      doc.rect(xPos, startY, headerSpacing, summaryCellHeight);
       doc.text(
         header,
-        xPos + (summaryCellWidth - doc.getTextWidth(header)) / 2,
+        xPos + (headerSpacing - doc.getTextWidth(header)) / 2,
         startY + 6
       );
     });
-  
+
     // Draw Summary Data
     startY += summaryCellHeight;
     doc.setFont("helvetica", "normal");
     summaryData.forEach((data, index) => {
-      const xPos = summaryStartX + index * summaryCellWidth;
-      doc.rect(xPos, startY, summaryCellWidth, summaryCellHeight);
+      const xPos = summaryStartX + index * headerSpacing;
+      doc.rect(xPos, startY, headerSpacing, summaryCellHeight);
       doc.text(
         data,
-        xPos + (summaryCellWidth - doc.getTextWidth(data)) / 2,
+        xPos + (headerSpacing - doc.getTextWidth(data)) / 2,
         startY + 6
       );
     });
-  
+
     // Final page footer
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
-  
+
     // Save the PDF
     doc.save("transaction_report.pdf");
   };
-  
 
   return (
     <div className="flex h-screen">
@@ -472,95 +481,96 @@ const Report = () => {
               </div>
             </div>
           </div>
+          <div>
+            {/* Transactions Table */}
+            {error && <div className="text-red-500 mt-4">{error}</div>}
 
-          {/* Transactions Table */}
-          {error && <div className="text-red-500 mt-4">{error}</div>}
-
-          {/* If transactions are loading, show a loading indicator */}
-          {loading ? (
-            <div className="flex justify-center items-center w-full h-96">
-            {/* Loading Animation */}
-            <div className="flex flex-col items-center">
-              <AiOutlineLoading3Quarters
-                className="text-purple-600 animate-spin text-6xl mb-4"
-                aria-label="Loading spinner"
-              />
-              <p className="text-lg text-gray-700 font-semibold">
-                Loading Analytics...
-              </p>
-            </div>
-          </div>
-          ) : (
-            <div className="flex flex-col overflow-clip mt-10 mx-auto max-w-7xl h-96">
-              {/* Check if there are transactions */}
-              {transactions.length === 0 ? (
-                <div className="text-center mt-10 text-lg text-gray-500">
-                  No Data Available
+            {/* If transactions are loading, show a loading indicator */}
+            {loading ? (
+              <div className="flex justify-center items-center w-full h-96">
+                {/* Loading Animation */}
+                <div className="flex flex-col items-center">
+                  <AiOutlineLoading3Quarters
+                    className="text-purple-600 animate-spin text-6xl mb-4"
+                    aria-label="Loading spinner"
+                  />
+                  <p className="text-lg text-gray-700 font-semibold">
+                    Loading Analytics...
+                  </p>
                 </div>
-              ) : (
-                <>
-                  <table className="w-full table-fixed bg-white">
-                    <thead className="bg-gray-200">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                          Category
-                        </th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                          Payment Method
-                        </th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                          Remarks
-                        </th>
-                        <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                      </tr>
-                    </thead>
-                  </table>
-
-                  <div className="flex overflow-y-auto">
-                    {/* To make the tbody scrollable */}
-                    <table className="w-full table-fixed">
-                      <tbody>
-                        {transactions.map((transaction) => (
-                          <tr
-                            key={transaction._id}
-                            className="bg-white border-b">
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {new Date(transaction.date).toLocaleDateString(
-                                "en-GB"
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {transaction.type}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {transaction.category.name}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {transaction.paymentMethod.name}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {transaction.remarks || "N/A"}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              ৳ {transaction.amount.toLocaleString()}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+              </div>
+            ) : (
+              <div className="flex flex-col overflow-clip mt-10 mx-auto max-w-7xl h-96">
+                {/* Check if there are transactions */}
+                {transactions.length === 0 ? (
+                  <div className="text-center mt-10 text-lg text-gray-500">
+                    No Data Available
                   </div>
-                </>
-              )}
-            </div>
-          )}
+                ) : (
+                  <>
+                    <table className="w-full table-fixed bg-white">
+                      <thead className="bg-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            Category
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            Payment Method
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            Remarks
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-500 uppercase tracking-wider">
+                            Amount
+                          </th>
+                        </tr>
+                      </thead>
+                    </table>
+
+                    <div className="flex overflow-y-auto">
+                      {/* To make the tbody scrollable */}
+                      <table className="w-full table-fixed">
+                        <tbody>
+                          {transactions.map((transaction) => (
+                            <tr
+                              key={transaction._id}
+                              className="bg-white border-b odd:bg-gray-100">
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {new Date(transaction.date).toLocaleDateString(
+                                  "en-GB"
+                                )}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {transaction.type}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {transaction.category.name}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {transaction.paymentMethod.name}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {transaction.remarks || "N/A"}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                ৳ {transaction.amount.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
