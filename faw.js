@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+
 import Select from "react-select";
 import Nav from "../components/Nav";
-const Transation = () => {
+
+const Transaction = () => {
   const [formData, setFormData] = useState({
     type: "",
     category: "",
@@ -22,7 +23,6 @@ const Transation = () => {
   const [filterSaveTrigger, setFilterSaveTrigger] = useState(0);
 
   useEffect(() => {
-    // Fetch categories and payment methods on component mount
     const fetchData = async () => {
       try {
         const categoryResponse = await axios.get(
@@ -40,7 +40,7 @@ const Transation = () => {
         if (cashPaymentMethod) {
           setFormData((prevData) => ({
             ...prevData,
-            paymentMethod: cashPaymentMethod._id, // set payment method to 'Cash'
+            paymentMethod: cashPaymentMethod._id,
           }));
         }
       } catch (error) {
@@ -55,7 +55,7 @@ const Transation = () => {
     try {
       const response = await axios.get(url);
       setter(response.data.transactions || []);
-      totalSetter(response.data[totalKey] || 0); 
+      totalSetter(response.data[totalKey] || 0);
     } catch (error) {
       console.error(`Error fetching data from ${url}:`, error);
     }
@@ -82,27 +82,47 @@ const Transation = () => {
     fetchAllData();
   }, [filterSaveTrigger]);
 
-    const renderTableRows = (data) =>
-      data.map((transaction) => (
-        <tr
-          key={transaction._id}
-          className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-          <td className="px-6 py-4">{transaction.category.name}</td>
-          <td className="px-6 py-4">{transaction.amount}</td>
-          <td className="px-6 py-4">{transaction.paymentMethod.name}</td>
-          <td className="px-6 py-4">Actions</td>
-        </tr>
-      ));
+  const handleDelete = async (id, type) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this transaction?"
+    );
+    if (!confirmDelete) return;
 
+    try {
+      const url = `http://localhost:5000/api/today-reports/${type}s/today/${id}`;
+      await axios.delete(url);
+      alert("Transaction deleted successfully");
+      setFilterSaveTrigger((prev) => prev + 1);
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      alert("Failed to delete transaction.");
+    }
+  };
+
+  const renderTableRows = (data, type) =>
+    data.map((transaction) => (
+      <tr
+        key={transaction._id}
+        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td className="px-6 py-4">{transaction.category.name}</td>
+        <td className="px-6 py-4">{transaction.amount}</td>
+        <td className="px-6 py-4">{transaction.paymentMethod.name}</td>
+        <td className="px-6 py-4">
+          <button
+            onClick={() => handleDelete(transaction._id, type)}
+            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">
+            Delete
+          </button>
+        </td>
+      </tr>
+    ));
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "amount") {
-      setFormData({ ...formData, [name]: value ? parseFloat(value) : "" });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData({
+      ...formData,
+      [name]: name === "amount" ? (value ? parseFloat(value) : "") : value,
+    });
   };
 
   const handleSelectChange = (selectedOption, name) => {
@@ -115,10 +135,7 @@ const Transation = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/transactions",
-        formData
-      );
+      await axios.post("http://localhost:5000/api/transactions", formData);
       alert("Transaction created successfully!");
       setFormData({
         type: "",
@@ -288,7 +305,7 @@ const Transation = () => {
           <div className="grid md:grid-cols-2 max-w-7xl mx-auto gap-5 ">
             {/* Credit Accounts Table */}
             <div className="relative w-full max-w-7xl col-span-1 mt-10 mb-20 mx-auto ">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-white bg-red-500 dark:bg-gray-700">
                   <tr>
                     <th className="px-6 py-3">Account Head</th>
@@ -299,7 +316,7 @@ const Transation = () => {
                 </thead>
                 <tbody>
                   {creditAccounts.length > 0 ? (
-                    renderTableRows(creditAccounts)
+                    renderTableRows(creditAccounts, "credit")
                   ) : (
                     <tr>
                       <td colSpan="4" className="text-center px-6 py-4">
@@ -321,7 +338,7 @@ const Transation = () => {
 
             {/* Debit Accounts Table */}
             <div className="relative w-full max-w-7xl col-span-1 mt-10 mb-20 mx-auto overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-white bg-blue-500 dark:bg-gray-700">
                   <tr>
                     <th className="px-6 py-3">Account Head</th>
@@ -332,7 +349,7 @@ const Transation = () => {
                 </thead>
                 <tbody>
                   {debitAccounts.length > 0 ? (
-                    renderTableRows(debitAccounts)
+                    renderTableRows(debitAccounts, "debit")
                   ) : (
                     <tr>
                       <td colSpan="4" className="text-center px-6 py-4">
@@ -351,7 +368,6 @@ const Transation = () => {
                 </tfoot>
               </table>
             </div>
-
             <div className="max-w-7xl mx-auto gap-5 flex justify-between"></div>
           </div>
         </div>
@@ -360,4 +376,4 @@ const Transation = () => {
   );
 };
 
-export default Transation;
+export default Transaction;
