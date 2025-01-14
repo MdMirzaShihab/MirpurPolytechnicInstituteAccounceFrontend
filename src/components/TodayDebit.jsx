@@ -10,9 +10,9 @@ const TodayDebit = ({
     data.map((transaction) => (
       <tr key={transaction._id} className="bg-white border-b hover:bg-gray-50">
         <td className="px-6 py-4">{transaction.category.name}</td>
-        <td className="px-6 py-4">{transaction.amount}</td>
-        <td className="px-6 py-4">{transaction.paymentMethod.name}</td>
-        <td className="px-6 py-4 flex gap-2">
+        <td className="px-6 py-4 text-end">{transaction.amount}</td>
+        <td className="px-6 py-4 text-center">{transaction.paymentMethod.name}</td>
+        <td className="px-6 py-4 flex justify-center gap-2">
           <button
             onClick={() => handleEdit(transaction, transaction.type)}
             className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium px-3 py-1 rounded">
@@ -37,9 +37,9 @@ const TodayDebit = ({
           <thead className="text-xs uppercase text-white bg-blue-500">
             <tr>
               <th className="px-6 py-3">Account Head</th>
-              <th className="px-6 py-3">Amount</th>
-              <th className="px-6 py-3">Payment Method</th>
-              <th className="px-6 py-3">Actions</th>
+              <th className="px-6 py-3 text-center">Amount</th>
+              <th className="px-6 py-3 text-center">Payment Method</th>
+              <th className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -60,7 +60,7 @@ const TodayDebit = ({
               <td colSpan="3" className="px-6 py-4 font-bold text-gray-700">
                 Total Debit
               </td>
-              <td className="px-6 py-4 font-bold text-gray-700">
+              <td className="px-6 py-4 font-bold text-gray-700 text-end">
                 {totalDebit}
               </td>
             </tr>

@@ -1,173 +1,56 @@
-import React, { useEffect, useState } from "react";
+Here I have added two parts, one is Categoty Settings and another is Payment Settings. They both are showing in the same screen. I want a tab selection option at the top so that if the user select category the screen will contain category settings and if the user select payment the screen will contain payment settings secton and if the user select payment the screen will contain payment settings section. Also if I can make new components for category and payment settings and pass props instead of having all the code in one file (Settings component), it will be better for me. Can you please help to separate the components and create a tab selection to switch between the components?.
+
+import React, { useState } from "react";
 import axios from "axios";
 
-import Select from "react-select";
 import Nav from "../components/Nav";
+import { components } from "react-select";
+const Settings = () => {
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryType, setCategoryType] = useState("credit");
+  const [paymentMethodName, setPaymentMethodName] = useState("");
+  const [message, setMessage] = useState("");
 
-const Transaction = () => {
-  const [formData, setFormData] = useState({
-    type: "",
-    category: "",
-    amount: "",
-    paymentMethod: "",
-    remarks: "",
-    date: new Date().toISOString().split("T")[0],
-  });
+  // API endpoints
+  const CATEGORY_API = "http://localhost:5000/api/categories";
+  const PAYMENT_METHOD_API = "http://localhost:5000/api/payment-methods";
 
-  const [categories, setCategories] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [debitAccounts, setDebitAccounts] = useState([]);
-  const [creditAccounts, setCreditAccounts] = useState([]);
-  const [totalDebit, setTotalDebit] = useState(0);
-  const [totalCredit, setTotalCredit] = useState(0);
-  const [filterSaveTrigger, setFilterSaveTrigger] = useState(0);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const categoryResponse = await axios.get(
-          "http://localhost:5000/api/categories"
-        );
-        const paymentMethodResponse = await axios.get(
-          "http://localhost:5000/api/payment-methods"
-        );
-        setCategories(categoryResponse.data);
-        setPaymentMethods(paymentMethodResponse.data);
-
-        const cashPaymentMethod = paymentMethodResponse.data.find(
-          (method) => method.name.toLowerCase() === "cash"
-        );
-        if (cashPaymentMethod) {
-          setFormData((prevData) => ({
-            ...prevData,
-            paymentMethod: cashPaymentMethod._id,
-          }));
-        }
-      } catch (error) {
-        console.error("Error fetching categories or payment methods:", error);
-      }
-    };
-
-    fetchData();
-  }, [formData.type]);
-
-  const fetchData = async (url, setter, totalSetter, totalKey) => {
-    try {
-      const response = await axios.get(url);
-      setter(response.data.transactions || []);
-      totalSetter(response.data[totalKey] || 0);
-    } catch (error) {
-      console.error(`Error fetching data from ${url}:`, error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchAllData = async () => {
-      await Promise.all([
-        fetchData(
-          "http://localhost:5000/api/today-reports/debits/today",
-          setDebitAccounts,
-          setTotalDebit,
-          "totalDebit"
-        ),
-        fetchData(
-          "http://localhost:5000/api/today-reports/credits/today",
-          setCreditAccounts,
-          setTotalCredit,
-          "totalCredit"
-        ),
-      ]);
-    };
-
-    fetchAllData();
-  }, [filterSaveTrigger]);
-
-  const handleDelete = async (id, type) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this transaction?"
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const url = `http://localhost:5000/api/today-reports/${type}s/today/${id}`;
-      await axios.delete(url);
-      alert("Transaction deleted successfully");
-      setFilterSaveTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Error deleting transaction:", error);
-      alert("Failed to delete transaction.");
-    }
-  };
-
-  const renderTableRows = (data, type) =>
-    data.map((transaction) => (
-      <tr
-        key={transaction._id}
-        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-        <td className="px-6 py-4">{transaction.category.name}</td>
-        <td className="px-6 py-4">{transaction.amount}</td>
-        <td className="px-6 py-4">{transaction.paymentMethod.name}</td>
-        <td className="px-6 py-4">
-          <button
-            onClick={() => handleDelete(transaction._id, type)}
-            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700">
-            Delete
-          </button>
-        </td>
-      </tr>
-    ));
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === "amount" ? (value ? parseFloat(value) : "") : value,
-    });
-  };
-
-  const handleSelectChange = (selectedOption, name) => {
-    setFormData({
-      ...formData,
-      [name]: selectedOption ? selectedOption.value : "",
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  // Function to handle category creation
+  const handleCreateCategory = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/transactions", formData);
-      alert("Transaction created successfully!");
-      setFormData({
-        type: "",
-        category: "",
-        amount: "",
-        paymentMethod: "",
-        remarks: "",
-        date: new Date().toISOString().split("T")[0],
+      const response = await axios.post(CATEGORY_API, {
+        type: categoryType,
+        name: categoryName,
       });
-      setFilterSaveTrigger((prev) => prev + 1);
+      setMessage(`Category created successfully: ${response.data.name}`);
+      setCategoryName(""); // Reset input field
     } catch (error) {
-      console.error("Error creating transaction:", error);
-      alert("Failed to create transaction.");
+      setMessage(
+        `Error creating category: ${
+          error.response?.data?.message || error.message
+        }`
+      );
     }
   };
 
-  const categoryOptions = categories
-    .filter((cat) => cat.type.toLowerCase() === formData.type.toLowerCase())
-    .map((cat) => ({
-      value: cat._id,
-      label: cat.name,
-    }));
-
-  const paymentMethodOptions = paymentMethods.map((method) => ({
-    value: method._id,
-    label: method.name,
-  }));
-
-  const typeOptions = [
-    { value: "credit", label: "Credit" },
-    { value: "debit", label: "Debit" },
-  ];
+  // Function to handle payment method creation
+  const handleCreatePaymentMethod = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(PAYMENT_METHOD_API, {
+        name: paymentMethodName,
+      });
+      setMessage(`Payment method created successfully: ${response.data.name}`);
+      setPaymentMethodName(""); // Reset input field
+    } catch (error) {
+      setMessage(
+        `Error creating payment method: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    }
+  };
 
   return (
     <div className="flex h-screen">
@@ -187,188 +70,112 @@ const Transaction = () => {
         {/* Content Area */}
 
         <div className="flex-1 p-4 bg-gray-200">
-          <div className="mx-auto max-w-7xl mt-10 bg-gray-100 shadow rounded">
-            <div className="bg-purple-900 p-2">
-              <h1 className="text-white font-bold text-center">Transation</h1>
+          {message && (
+            <div
+              className="mb-4 p-3 text-sm font-medium text-white bg-green-500 rounded-md"
+              role="alert">
+              {message}
             </div>
-            <form onSubmit={handleSubmit}>
-              <div className="grid md:grid-cols-6 p-5 gap-5">
-                <div className="col-span-1">
-                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Accounts Type
+          )}
+
+          {/* Categoty Settings */}
+          <div className="bg-purple-900 max-w-7xl p-5 rounded mx-auto">
+            <form onSubmit={handleCreateCategory}>
+              <div className="grid md:grid-cols-3  gap-5 max-w-7xl">
+                <div className="col-span-1  gap-5 ">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-white dark:text-white">
+                    Account Type
                   </label>
-                  <Select
-                    name="type"
-                    value={typeOptions.find(
-                      (option) => option.value === formData.type
-                    )}
-                    onChange={(selectedOption) =>
-                      handleSelectChange(selectedOption, "type")
-                    }
-                    options={typeOptions}
-                    placeholder="Select Type"
-                    required
-                    isSearchable
-                    className="w-full"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Accounts Head
+
+                  <label className="flex mb-3 items-center ">
+                    <input
+                      type="radio"
+                      name="categoryType"
+                      value="credit"
+                      checked={categoryType === "credit"}
+                      onChange={() => setCategoryType("credit")}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-2"
+                    />
+                    <span className="ms-2 text-sm font-medium text-white dark:text-gray-300">
+                      Credit
+                    </span>
                   </label>
-                  <Select
-                    name="category"
-                    value={categoryOptions.find(
-                      (option) => option.value === formData.category
-                    )}
-                    onChange={(selectedOption) =>
-                      handleSelectChange(selectedOption, "category")
-                    }
-                    options={categoryOptions}
-                    placeholder="Select Head"
-                    isDisabled={!formData.type}
-                    isSearchable
-                    className="w-full"
-                    required
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Amount
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="categoryType"
+                      value="debit"
+                      checked={categoryType === "debit"}
+                      onChange={() => setCategoryType("debit")}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-2"
+                    />
+                    <span className="ms-2 text-sm font-medium text-white dark:text-gray-300">
+                      Debit
+                    </span>
                   </label>
-                  <input
-                    type="number"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="Amount"
-                    name="amount"
-                    value={formData.amount || ""}
-                    onChange={handleInputChange}
-                    required
-                  />
                 </div>
+
                 <div className="col-span-1">
-                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Payment Method
+                  <label className="block mb-2 mt-2 text-sm font-medium text-white dark:text-white">
+                    Account Head
                   </label>
-                  <Select
-                    placeholder="Payment Method"
-                    isSearchable
-                    className="w-full"
-                    name="paymentMethod"
-                    value={paymentMethodOptions.find(
-                      (option) => option.value === formData.paymentMethod
-                    )}
-                    onChange={(selectedOption) =>
-                      handleSelectChange(selectedOption, "paymentMethod")
-                    }
-                    options={paymentMethodOptions}
-                    required
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      id="categoryName"
+                      value={categoryName}
+                      onChange={(e) => setCategoryName(e.target.value)}
+                      placeholder="Enter category name"
+                      required
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                    />
+                  </div>
                 </div>
-                <div className="col-span-1">
-                  <label className="block mb-2 mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="date"
-                    value={formData.date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, date: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Your message
-                  </label>
-                  <textarea
-                    name="remarks"
-                    value={formData.remarks || ""}
-                    onChange={handleInputChange}
-                    rows="2"
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Write your thoughts here..."></textarea>
-                </div>
-                <div className="col-span-5 "></div>
+
                 <div className="col-span-1 ">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-white dark:text-white">
+                    Action
+                  </label>
                   <button
                     type="submit"
-                    className="bg-green-500  ms-auto border border-gray-300 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    className="bg-green-700 w-[60px] rounded m-1 text-white p-1">
                     Save
                   </button>
                 </div>
               </div>
             </form>
           </div>
-          <div className="grid md:grid-cols-2 max-w-7xl mx-auto gap-5 ">
-            {/* Credit Accounts Table */}
-            <div className="relative w-full max-w-7xl col-span-1 mt-10 mb-20 mx-auto ">
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-white bg-red-500 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3">Account Head</th>
-                    <th className="px-6 py-3">Amount</th>
-                    <th className="px-6 py-3">Payment Method</th>
-                    <th className="px-6 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {creditAccounts.length > 0 ? (
-                    renderTableRows(creditAccounts, "credit")
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="text-center px-6 py-4">
-                        No credit accounts available
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan="3" className="px-6 py-4 font-bold">
-                      Total Credit
-                    </td>
-                    <td className="px-6 py-4 font-bold">{totalCredit}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+{/* Payment Settings */}
+          <div className="bg-purple-900 max-w-7xl mt-10 p-5 rounded mx-auto">
+            <form onSubmit={handleCreatePaymentMethod}>
+              <div className="grid md:grid-cols-2  gap-5 max-w-7xl">
+                <div className="col-span-1">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-white dark:text-white">
+                    Payment
+                  </label>
+                  <input
+                    type="text"
+                    id="paymentMethodName"
+                    value={paymentMethodName}
+                    onChange={(e) => setPaymentMethodName(e.target.value)}
+                    placeholder="Enter payment method name"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                    required
+                  />
+                </div>
 
-            {/* Debit Accounts Table */}
-            <div className="relative w-full max-w-7xl col-span-1 mt-10 mb-20 mx-auto overflow-x-auto">
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-white bg-blue-500 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3">Account Head</th>
-                    <th className="px-6 py-3">Amount</th>
-                    <th className="px-6 py-3">Payment Method</th>
-                    <th className="px-6 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {debitAccounts.length > 0 ? (
-                    renderTableRows(debitAccounts, "debit")
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="text-center px-6 py-4">
-                        No debit accounts available
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan="3" className="px-6 py-4 font-bold">
-                      Total Debit
-                    </td>
-                    <td className="px-6 py-4 font-bold">{totalDebit}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-            <div className="max-w-7xl mx-auto gap-5 flex justify-between"></div>
+                <div className="col-span-1 ">
+                  <label className="block mb-2 mt-2 text-sm font-medium text-white dark:text-white">
+                    Action
+                  </label>
+                  <button
+                    type="submit"
+                    className="bg-green-700 w-[60px] rounded m-1 text-white p-1">
+                    Save
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -376,4 +183,4 @@ const Transaction = () => {
   );
 };
 
-export default Transaction;
+export default Settings;

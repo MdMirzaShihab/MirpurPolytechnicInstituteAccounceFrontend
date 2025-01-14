@@ -6,7 +6,7 @@ import TransactionForm from "./TransactionForm";
 import TodayDebit from "./TodayDebit";
 import TodayCredit from "./TodayCredit";
 import Nav from "../components/Nav";
-import ConfirmationModal from "../components/ConfirmationModal"; // Add this new component
+import ConfirmationModal from "../components/ConfirmationModal";
 
 const Transaction = () => {
   const [formData, setFormData] = useState({
@@ -194,7 +194,7 @@ const Transaction = () => {
 
         <div className="p-6 space-y-6">
           {/* Transaction Form */}
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <div className="bg-white shadow-lg shadow-purple-400 rounded-lg p-6">
             <h2 className="text-3xl font-bold text-center text-purple-800 mb-4">
               Create or Edit Transaction
             </h2>
@@ -210,7 +210,7 @@ const Transaction = () => {
 
           {/* Today’s Debit and Credit Reports */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white shadow-md rounded-lg p-6">
+            <div className="bg-white shadow-lg rounded-lg shadow-blue-400 p-6">
               <TodayDebit
                 debitAccounts={debitAccounts}
                 totalDebit={totalDebit}
@@ -218,7 +218,7 @@ const Transaction = () => {
                 handleEdit={(transaction) => handleEdit(transaction, "debit")}
               />
             </div>
-            <div className="bg-white shadow-md rounded-lg p-6">
+            <div className="bg-white shadow-lg rounded-lg shadow-red-400 p-6">
               <TodayCredit
                 creditAccounts={creditAccounts}
                 totalCredit={totalCredit}
