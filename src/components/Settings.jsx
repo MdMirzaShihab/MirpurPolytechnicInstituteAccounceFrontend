@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Nav from "../components/Nav";
+import Nav from "./Nav";
 import CategorySettings from "./CategorySettings";
 import PaymentSettings from "./PaymentSettings";
 

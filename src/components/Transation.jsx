@@ -194,7 +194,7 @@ const Transaction = () => {
 
         <div className="p-6 space-y-6">
           {/* Transaction Form */}
-          <div className="bg-white shadow-lg shadow-purple-400 rounded-lg p-6">
+          <div className="bg-purple-200 shadow-lg shadow-purple-300 rounded-lg p-6">
             <h2 className="text-3xl font-bold text-center text-purple-800 mb-4">
               Create or Edit Transaction
             </h2>
@@ -210,7 +210,7 @@ const Transaction = () => {
 
           {/* Today’s Debit and Credit Reports */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white shadow-lg rounded-lg shadow-blue-400 p-6">
+            <div className="bg-blue-100 shadow-lg rounded-lg shadow-blue-300 p-6">
               <TodayDebit
                 debitAccounts={debitAccounts}
                 totalDebit={totalDebit}
@@ -218,7 +218,7 @@ const Transaction = () => {
                 handleEdit={(transaction) => handleEdit(transaction, "debit")}
               />
             </div>
-            <div className="bg-white shadow-lg rounded-lg shadow-red-400 p-6">
+            <div className="bg-red-100 shadow-lg rounded-lg shadow-red-300 p-6">
               <TodayCredit
                 creditAccounts={creditAccounts}
                 totalCredit={totalCredit}

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Pie, Bar } from "react-chartjs-2";
 import Nav from "../components/Nav";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import LoadingAnimation from "./LoadingAnimation";
+import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineTrophy, AiOutlineTransaction, AiOutlineAccountBook, AiOutlineNumber } from "react-icons/ai";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -26,7 +27,6 @@ const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
-    // Fetch analytics data from the API
     const fetchAnalytics = async () => {
       try {
         const response = await axios.get(
@@ -41,7 +41,6 @@ const Dashboard = () => {
     fetchAnalytics();
   }, []);
 
-  // Prepare data for Pie Charts and Bar Chart if analytics data exists
   const debitCategoryData = analytics
     ? {
         labels: analytics.debitByCategory.map((item) => item.category),
@@ -49,14 +48,7 @@ const Dashboard = () => {
           {
             label: "Debit Categories",
             data: analytics.debitByCategory.map((item) => item.total),
-            backgroundColor: [
-              "#FF6384",
-              "#36A2EB",
-              "#FFCE56",
-              "#66BB6A",
-              "#FFA726",
-            ],
-            borderWidth: 1,
+            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#66BB6A"],
           },
         ],
       }
@@ -69,14 +61,7 @@ const Dashboard = () => {
           {
             label: "Credit Categories",
             data: analytics.creditByCategory.map((item) => item.total),
-            backgroundColor: [
-              "#4BC0C0",
-              "#FF9F40",
-              "#FF6384",
-              "#9966FF",
-              "#36A2EB",
-            ],
-            borderWidth: 1,
+            backgroundColor: ["#4BC0C0", "#FF9F40", "#FF6384", "#9966FF"],
           },
         ],
       }
@@ -90,70 +75,119 @@ const Dashboard = () => {
             label: "Amount",
             data: [analytics.totalDebits, analytics.totalCredits],
             backgroundColor: ["#FF6384", "#36A2EB"],
-            borderWidth: 1,
           },
         ],
       }
     : {};
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <div className="bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300">
+      <div className="bg-purple-900 text-white h-screen w-60">
         <Nav />
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
-        <div className="bg-purple-900 text-white px-4 py-2 flex justify-end items-center">
-          <button className="font-bold">logout</button>
+        <div className="bg-purple-900 text-white px-4 py-2 flex justify-end">
+          <button className="font-bold">Logout</button>
         </div>
 
-        {/* Content Area */}
-        <div className="p-6 overflow-y-scroll grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Dashboard Content */}
+        <h2 className="text-3xl font-bold text-center text-purple-800 mt-4">
+          Dashboard for this Month
+        </h2>
+        <div className="flex-1 p-6 grid gap-6 overflow-hidden">
+          {/* Check for loading */}
           {!analytics ? (
-            <div className="flex justify-center items-center h-full w-full">
-              {/* Loading Animation */}
-              <div className="flex flex-col items-center">
-                <AiOutlineLoading3Quarters
-                  className="text-purple-600 animate-spin text-6xl mb-4"
-                  aria-label="Loading spinner"
-                />
-                <p className="text-lg text-gray-700 font-semibold">
-                  Loading Analytics...
-                </p>
+            <LoadingAnimation message="Fetching data..." />
+          ) : (
+            <div className="flex-1 p-6 grid gap-6">
+              {/* KPI Section */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="bg-red-100 shadow rounded p-4 flex flex-col items-center">
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    Total Debits
+                  </h2>
+                  <p className="text-2xl font-bold text-red-600">
+                    ৳ {analytics.totalDebits.toLocaleString()}
+                  </p>
+                  <AiOutlineArrowDown className="text-red-600 text-xl" />
+                </div>
+                <div className="bg-green-100 shadow rounded p-4 flex flex-col items-center">
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    Total Credits
+                  </h2>
+                  <p className="text-2xl font-bold text-green-600">
+                    ৳ {analytics.totalCredits.toLocaleString()}
+                  </p>
+                  <AiOutlineArrowUp className="text-green-600 text-xl" />
+                </div>
+                <div className="bg-yellow-100 shadow rounded p-4 flex flex-col items-center">
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    Total Balance
+                  </h2>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {(
+                      analytics.totalCredits - analytics.totalDebits
+                    ).toLocaleString()}
+                  </p>
+                  <AiOutlineTransaction className="text-yellow-600 text-xl" />
+                </div>
+                <div className="bg-orange-100 shadow rounded p-4 flex flex-col items-center">
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    Total Transactions
+                  </h2>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {analytics.totalTransactions}
+                  </p>
+                  <AiOutlineNumber className="text-orange-600 text-xl" />
+                </div>
+              </div>
+
+              {/* Chart Section */}
+              <div className="flex flex-col xl:flex-row gap-6">
+                {/* Debit Pie Chart */}
+                <div className="bg-white shadow rounded p-4 flex flex-col flex-1">
+                  <h2 className="text-lg font-semibold mb-4">
+                    Debit Breakdown by Category
+                  </h2>
+                  <div className="flex justify-center h-full items-center">
+                    <Pie
+                      data={debitCategoryData}
+                      options={{ maintainAspectRatio: false }}
+                    />
+                  </div>
+                </div>
+
+                {/* Credit Pie Chart */}
+                <div className="bg-white shadow rounded p-4 flex flex-col flex-1">
+                  <h2 className="text-lg font-semibold mb-4">
+                    Credit Breakdown by Category
+                  </h2>
+                  <div className="flex justify-center h-full items-center">
+                    <Pie
+                      data={creditCategoryData}
+                      options={{ maintainAspectRatio: false }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bar Chart */}
+                <div className="bg-white shadow rounded p-4 flex flex-col flex-1">
+                  <h2 className="text-lg font-semibold mb-4">
+                    Total Debits vs Credits
+                  </h2>
+                  <div className="flex justify-center h-full items-center">
+                    <Bar
+                      data={debitCreditComparisonData}
+                      options={{ maintainAspectRatio: false }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          ) : (
-            <>
-              {/* Charts */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Debit Category Pie Chart */}
-                <div className="bg-white shadow-md rounded p-4">
-                  <h2 className="text-xl font-semibold mb-4">
-                    Debit Breakdown
-                  </h2>
-                  <Pie data={debitCategoryData} />
-                </div>
-
-                {/* Credit Category Pie Chart */}
-                <div className="bg-white shadow-md rounded p-4">
-                  <h2 className="text-xl font-semibold mb-4">
-                    Credit Breakdown
-                  </h2>
-                  <Pie data={creditCategoryData} />
-                </div>
-              </div>
-
-              {/* Debit vs Credit Comparison */}
-              <div className="mt-6 bg-white shadow-md rounded p-4">
-                <h2 className="text-xl font-semibold mb-4">
-                  Debit vs Credit Comparison
-                </h2>
-                <Bar data={debitCreditComparisonData} />
-              </div>
-            </>
           )}
         </div>
       </div>

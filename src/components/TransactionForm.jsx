@@ -27,10 +27,11 @@ const TransactionForm = ({
   }));
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6">
-      <div className="grid md:grid-cols-6 gap-6">
+    <form onSubmit={handleSubmit} className=" rounded-lg p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Account Type */}
-        <div className="col-span-1 md:col-span-2">
+
+        <div className="">
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Account Type
           </label>
@@ -56,9 +57,8 @@ const TransactionForm = ({
             }}
           />
         </div>
-
         {/* Account Head */}
-        <div className="col-span-1 md:col-span-2">
+        <div className="">
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Account Head
           </label>
@@ -88,24 +88,8 @@ const TransactionForm = ({
           />
         </div>
 
-        {/* Amount */}
-        <div className="col-span-1 md:col-span-1">
-          <label className="block mb-2 text-sm font-medium text-purple-900">
-            Amount
-          </label>
-          <input
-            type="number"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-purple-500 focus:border-purple-500"
-            placeholder="Amount"
-            name="amount"
-            value={formData.amount || ""}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
         {/* Payment Method */}
-        <div className="col-span-1 md:col-span-2">
+        <div className="">
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Payment Method
           </label>
@@ -135,13 +119,13 @@ const TransactionForm = ({
         </div>
 
         {/* Date */}
-        <div className="col-span-1">
+        <div className="">
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Date
           </label>
           <input
             type="date"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-purple-500 focus:border-purple-500"
+            className="bg-gray-50 border border-gray-400 text-gray-900 text-sm rounded-lg block w-full p-2 focus:ring-purple-500 focus:border-purple-500"
             value={formData.date}
             onChange={(e) =>
               handleInputChange({
@@ -150,9 +134,26 @@ const TransactionForm = ({
             }
           />
         </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-2">
+        {/* Amount */}
+        <div className="">
+          <label className="block mb-2 text-sm font-medium text-purple-900">
+            Amount
+          </label>
+          <input
+            type="number"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-5 focus:ring-purple-500 focus:border-purple-500"
+            placeholder="Amount"
+            name="amount"
+            value={formData.amount || ""}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
 
         {/* Remarks */}
-        <div className="col-span-1 md:col-span-3">
+        <div className="col-span-2">
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Remarks
           </label>
@@ -169,7 +170,7 @@ const TransactionForm = ({
       <div className="col-span-1 md:col-span-1 flex justify-center items-center pt-5">
         <button
           type="submit"
-          className="bg-purple-900 hover:bg-purple-800 text-white text-sm rounded-lg block w-full p-2.5 hover:shadow-purple-500 font-medium shadow-md transition-all duration-300">
+          className="bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg block w-full p-2.5 hover:shadow-purple-500 font-medium shadow-md transition-all duration-300">
           Save Transaction
         </button>
       </div>

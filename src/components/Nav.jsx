@@ -47,8 +47,8 @@ const Nav = () => {
               </Link>
             </li>
             <li>
-              <Link to="/setting" className="block p-4 hover:bg-purple-900">
-                Setting
+              <Link to="/settings" className="block p-4 hover:bg-purple-900">
+                Settings
               </Link>
             </li>
           </ul>

@@ -107,13 +107,17 @@ const PaymentSettings = () => {
       <ToastContainer />
 
       {/* Form */}
-      <form onSubmit={handleSavePaymentMethod} className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">
-          {editingPaymentMethod ? "Edit Payment Method" : "Create Payment Method"}
+      <form
+        onSubmit={handleSavePaymentMethod}
+        className="bg-purple-200 p-6 rounded-lg shadow-md">
+        <h2 className="text-xl text-center font-semibold mb-4 text-gray-700">
+          {editingPaymentMethod
+            ? "Edit Payment Method"
+            : "Create Payment Method"}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           {/* Name Input */}
-          <div>
+          <div className="col-span-3">
             <label className="block text-sm font-medium text-gray-600">
               Payment Method
             </label>
@@ -123,7 +127,7 @@ const PaymentSettings = () => {
               onChange={(e) => setPaymentMethodName(e.target.value)}
               placeholder="Enter payment method name"
               required
-              className="mt-2 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-300"
+              className="mt-2 w-full p-2 border-2 border-purple-300 shadow-md rounded-lg focus:ring-2 focus:ring-blue-300"
             />
           </div>
 
@@ -131,8 +135,7 @@ const PaymentSettings = () => {
           <div className="flex items-end">
             <button
               type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700"
-            >
+              className="bg-blue-600 text-white py-2 px-6 rounded-lg shadow hover:bg-blue-700">
               {editingPaymentMethod ? "Update" : "Save"}
             </button>
           </div>
@@ -141,54 +144,76 @@ const PaymentSettings = () => {
 
       {/* Payment Method List */}
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Payment Methods</h2>
-              {/* Search Input */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearch}
-          placeholder="Search payment methods..."
-          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-300"
-        />
-      </div>
-
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="min-w-full text-left text-gray-700">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPaymentMethods.map((method) => (
-                <tr key={method._id} className="border-t">
-                  <td className="px-4 py-2">{method.name}</td>
-                  <td className="px-4 py-2 text-center space-x-2">
-                    <button
-                      onClick={() => handleEditPaymentMethod(method)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => confirmDeletePaymentMethod(method)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filteredPaymentMethods.length === 0 && (
-            <div className="text-center py-4 text-gray-500">
-              No categories found.
-            </div>
-          )}
+        <h2 className="text-xl font-semibold mb-4 text-gray-700">
+          Payment Methods
+        </h2>
+        {/* Search Input */}
+        <div className="mb-6">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Search payment methods..."
+            className="w-full p-2 border-2 shadow-md shadow-purple-300 border-purple-200 rounded-lg focus:ring-2 focus:ring-blue-300"
+          />
         </div>
+
+        <div className="bg-purple-100 shadow-md">
+  {/* Wrapper for the header and body */}
+  <div className="bg-purple-100 shadow-md h-96 overflow-y-auto">
+  {/* Table Header */}
+  <table className="min-w-full text-left text-gray-700 bg-purple-200">
+    <thead>
+      <tr>
+        <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Name</th>
+        <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">
+          Actions
+        </th>
+      </tr>
+    </thead>
+
+
+  {/* Scrollable Table Body */}
+
+      <tbody>
+        {filteredPaymentMethods.map((method) => (
+          <tr key={method._id} className="border-t odd:bg-gray-100">
+            <td className="px-4 py-2">{method.name}</td>
+            <td className="px-4 py-2 text-center space-x-2">
+              <button
+                onClick={() => handleEditPaymentMethod(method)}
+                className="text-blue-500 hover:text-blue-700"
+              >
+                <FaEdit />
+              </button>
+              <button
+                onClick={() => confirmDeletePaymentMethod(method)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <FaTrash />
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+
+  {/* No Categories Found */}
+  {filteredPaymentMethods.length === 0 && (
+    <div className="text-center py-4 text-gray-500">No categories found.</div>
+  )}
+</div>
+
+
+  {/* No Categories Found */}
+  {filteredPaymentMethods.length === 0 && (
+    <div className="text-center py-4 text-gray-500">
+      No categories found.
+    </div>
+  )}
+</div>
+
       </div>
 
       {/* Confirmation Modal */}

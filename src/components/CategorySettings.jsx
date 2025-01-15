@@ -41,10 +41,13 @@ const CategorySettings = () => {
     e.preventDefault();
     try {
       if (editingCategory) {
-        const response = await axios.put(`${CATEGORY_API}/${editingCategory._id}`, {
-          type: categoryType,
-          name: categoryName,
-        });
+        const response = await axios.put(
+          `${CATEGORY_API}/${editingCategory._id}`,
+          {
+            type: categoryType,
+            name: categoryName,
+          }
+        );
         toast.success(`Category updated successfully: ${response.data.name}`);
       } else {
         const response = await axios.post(CATEGORY_API, {
@@ -113,7 +116,9 @@ const CategorySettings = () => {
       {/* Success/Error Message handled by Toastify */}
 
       {/* Form */}
-      <form onSubmit={handleSaveCategory} className="bg-white p-6 rounded-lg shadow-md">
+      <form
+        onSubmit={handleSaveCategory}
+        className="bg-purple-200 p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4 text-gray-700">
           {editingCategory ? "Edit Category" : "Create Category"}
         </h2>
@@ -160,7 +165,7 @@ const CategorySettings = () => {
               onChange={(e) => setCategoryName(e.target.value)}
               placeholder="Enter category name"
               required
-              className="mt-2 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-300"
+              className="mt-2 w-full p-2 border-2 border-purple-300 shadow-md rounded-lg focus:ring-2 focus:ring-blue-300"
             />
           </div>
 
@@ -168,60 +173,67 @@ const CategorySettings = () => {
           <div className="flex items-end">
             <button
               type="submit"
-              className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700"
-            >
+              className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700">
               {editingCategory ? "Update" : "Save"}
             </button>
           </div>
         </div>
       </form>
 
-      {/* Search Input */}
-      <div className="mt-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearch}
-          placeholder="Search categories..."
-          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-300"
-        />
-      </div>
-
       {/* Category List */}
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-4 text-gray-700">Categories</h2>
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="min-w-full text-left text-gray-700">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Type</th>
-                <th className="px-4 py-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCategories.map((category) => (
-                <tr key={category._id} className="border-t">
-                  <td className="px-4 py-2">{category.name}</td>
-                  <td className="px-4 py-2 capitalize">{category.type}</td>
-                  <td className="px-4 py-2 text-center space-x-2">
-                    <button
-                      onClick={() => handleEditCategory(category)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => confirmDeleteCategory(category)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
+        {/* Search Input */}
+        <div className="mb-6">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Search categories..."
+            className="w-full p-2 border-2 shadow-md shadow-purple-300 border-purple-200 rounded-lg focus:ring-2 focus:ring-blue-300"
+          />
+        </div>
+        <div className="bg-purple-100 shadow-md">
+          {/* Wrapper for the header and body */}
+          <div className="h-96 overflow-y-auto">
+            {/* Header */}
+            <table className="min-w-full text-left text-gray-700">
+              <thead className="bg-purple-200">
+                <tr>
+                  <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                    Name
+                  </th>
+                  <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                    Type
+                  </th>
+                  <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {filteredCategories.map((category) => (
+                  <tr key={category._id} className="border-t odd:bg-gray-50">
+                    <td className="px-4 py-2">{category.name}</td>
+                    <td className="px-4 py-2 capitalize">{category.type}</td>
+                    <td className="px-4 py-2 text-center space-x-2">
+                      <button
+                        onClick={() => handleEditCategory(category)}
+                        className="text-blue-500 hover:text-blue-700">
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => confirmDeleteCategory(category)}
+                        className="text-red-500 hover:text-red-700">
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {filteredCategories.length === 0 && (
             <div className="text-center py-4 text-gray-500">
               No categories found.
@@ -233,7 +245,7 @@ const CategorySettings = () => {
       {/* Confirmation Modal */}
       {showModal && (
         <ConfirmationModal
-        onCancel={() => setShowModal(false)}
+          onCancel={() => setShowModal(false)}
           onConfirm={handleDeleteCategory}
           title="Confirm Deletion"
           message={`Are you sure you want to delete the category "${categoryToDelete?.name}"? This action cannot be undone.`}
