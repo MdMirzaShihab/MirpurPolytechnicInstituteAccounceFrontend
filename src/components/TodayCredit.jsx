@@ -32,7 +32,7 @@ const TodayCredit = ({
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-        Today's Debits
+        Today's Credit
       </h2>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-left text-gray-600 border rounded-lg">

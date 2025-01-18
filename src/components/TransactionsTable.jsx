@@ -6,11 +6,9 @@ const TransactionsTable = ({ transactions, handlePrint }) => (
     <div className="flex items-center justify-between bg-purple-200 px-6 py-3">
       <h2 className="text-lg font-bold text-gray-600">Transactions</h2>
       <div className="flex justify-end">
-        <button
-          onClick={handlePrint}
-          className="flex items-center font-bold px-6 text-green-900 hover:text-green-700 ">
+        <button onClick={handlePrint} className="flex items-center font-bold px-6 text-green-900 hover:text-green-700 ">
           <AiOutlinePrinter className="mr-2 w-10 h-10 " />
-          Print
+        Print
         </button>
       </div>
     </div>

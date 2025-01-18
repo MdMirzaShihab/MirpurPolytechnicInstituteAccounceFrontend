@@ -132,7 +132,7 @@ const Report = () => {
             {loading ? (
               <LoadingAnimation message="Fetching data..." />
             ) : transactions.length > 0 ? (
-              <TransactionsTable transactions={transactions} />
+              <TransactionsTable transactions={transactions} handlePrint={handlePrint} />
             ) : (
               <p className="text-center text-gray-500 mt-10">
                 No transactions available for the selected filters.
