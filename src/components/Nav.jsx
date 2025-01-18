@@ -1,25 +1,21 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import mpi from "../assets/mpi.png";
+
 const Nav = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [submenuOpen, setSubmenuOpen] = useState(false); // Toggle for submenu
+  const [activeTab, setActiveTab] = useState(""); // State to track active tab
+  const location = useLocation(); // Hook to get current path
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const toggleSubmenu = () => {
-    setSubmenuOpen(!submenuOpen);
-  };
+  // Update active tab when the path changes
+  React.useEffect(() => {
+    setActiveTab(location.pathname); // Set the active tab based on the current URL
+  }, [location]);
 
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
       <div
-        className={`${
-          sidebarOpen ? "w-64" : "w-16"
-        } bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}>
+        className={`bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}>
         <div className="flex-1 flex flex-row m-3">
           <img src={mpi} className="w-12 h-12" />
           {/* Navbar */}
@@ -31,23 +27,38 @@ const Nav = () => {
         <nav>
           <ul className="space-y-0">
             <li>
-              <Link to="/dashboard" className="block p-4 hover:bg-purple-900">
+              <Link
+                to="/dashboard"
+                className={`block p-4 hover:bg-purple-800 ${
+                  activeTab === "/dashboard" ? "bg-purple-500" : ""
+                }`}>
                 Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/transation" className="block p-4 hover:bg-purple-900">
+              <Link
+                to="/transation"
+                className={`block p-4 hover:bg-purple-800 ${
+                  activeTab === "/transation" ? "bg-purple-500" : ""
+                }`}>
                 Transactions
               </Link>
             </li>
-
             <li>
-              <Link to="/report" className="block p-4 hover:bg-purple-900">
+              <Link
+                to="/report"
+                className={`block p-4 hover:bg-purple-800 ${
+                  activeTab === "/report" ? "bg-purple-500" : ""
+                }`}>
                 Reports
               </Link>
             </li>
             <li>
-              <Link to="/settings" className="block p-4 hover:bg-purple-900">
+              <Link
+                to="/settings"
+                className={`block p-4 hover:bg-purple-800 ${
+                  activeTab === "/settings" ? "bg-purple-500" : ""
+                }`}>
                 Settings
               </Link>
             </li>

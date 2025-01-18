@@ -110,16 +110,14 @@ const CategorySettings = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-4xl mx-auto mt-10">
+    <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-7xl mx-auto">
       <ToastContainer />
-
-      {/* Success/Error Message handled by Toastify */}
 
       {/* Form */}
       <form
         onSubmit={handleSaveCategory}
         className="bg-purple-200 p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">
+        <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">
           {editingCategory ? "Edit Category" : "Create Category"}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

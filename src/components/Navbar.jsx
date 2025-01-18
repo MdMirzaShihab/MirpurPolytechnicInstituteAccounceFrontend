@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import Nav from "../components/Nav"
+import Nav from "../components/Nav";
 const Navbar = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false); // Toggle for submenu
@@ -19,9 +19,8 @@ const Navbar = () => {
       <div
         className={`${
           sidebarOpen ? "w-64" : "w-16"
-        } bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}
-      >
-          <Nav />
+        } bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}>
+        <Nav />
       </div>
 
       {/* Main Content */}
@@ -39,7 +38,5 @@ const Navbar = () => {
     </div>
   );
 };
-
-
 
 export default Navbar;

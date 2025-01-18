@@ -11,7 +11,9 @@ const TodayCredit = ({
       <tr key={transaction._id} className="bg-white border-b hover:bg-gray-50">
         <td className="px-6 py-4">{transaction.category.name}</td>
         <td className="px-6 py-4 text-end">{transaction.amount}</td>
-        <td className="px-6 py-4 text-center">{transaction.paymentMethod.name}</td>
+        <td className="px-6 py-4 text-center">
+          {transaction.paymentMethod.name}
+        </td>
         <td className="px-6 py-4 flex justify-center gap-2">
           <button
             onClick={() => handleEdit(transaction, transaction.type)}

@@ -3,7 +3,12 @@ import axios from "axios";
 import { Pie, Bar } from "react-chartjs-2";
 import Nav from "../components/Nav";
 import LoadingAnimation from "./LoadingAnimation";
-import { AiOutlineArrowUp, AiOutlineArrowDown, AiOutlineTrophy, AiOutlineTransaction, AiOutlineAccountBook, AiOutlineNumber } from "react-icons/ai";
+import {
+  AiOutlineArrowUp,
+  AiOutlineArrowDown,
+  AiOutlineTransaction,
+  AiOutlineNumber,
+} from "react-icons/ai";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -13,6 +18,8 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
+import { useNavigate } from "react-router-dom";
+import Clock from "./Clock";
 
 ChartJS.register(
   ArcElement,
@@ -25,6 +32,7 @@ ChartJS.register(
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -80,6 +88,11 @@ const Dashboard = () => {
       }
     : {};
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("isLoggedIn");
+    navigate("/");
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -90,8 +103,13 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Navbar */}
-        <div className="bg-purple-900 text-white px-4 py-2 flex justify-end">
-          <button className="font-bold">Logout</button>
+        <div className="bg-purple-900 text-white px-4 py-2 flex justify-between">
+          <Clock />
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-500 text-white py-1 px-4 rounded-lg">
+            Logout
+          </button>
         </div>
 
         {/* Dashboard Content */}

@@ -1,30 +1,64 @@
-import React from 'react'
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar"
-import Transation from "./components/Transation"
-import Report from './components/Report';
-import Settings from './components/Settings';
-import Dashboard from './components/Dashboard';
-function App() {
+import Login from "./components/Login";
+import Transation from "./components/Transation";
+import Report from "./components/Report";
+import Settings from "./components/Settings";
+import Dashboard from "./components/Dashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./components/NotFound";
 
+function App() {
   return (
     <>
-    <Router>
-      
-      
+      <Router>
         <Routes>
-          <Route path="/" element={<Navbar />} />
-          <Route path="/transation" element={<Transation />} />
-          <Route path="/report" element={<Report />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Login />} />
+          {/* Protected Route */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transation"
+            element={
+              <ProtectedRoute>
+                <Transation />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/report"
+            element={
+              <ProtectedRoute>
+                <Report />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <ProtectedRoute>
+                <NotFound />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      
-    </Router>
-      
-      
+      </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

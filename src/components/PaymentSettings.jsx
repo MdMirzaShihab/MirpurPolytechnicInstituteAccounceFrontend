@@ -103,7 +103,7 @@ const PaymentSettings = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-4xl mx-auto mt-10">
+    <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-7xl mx-auto">
       <ToastContainer />
 
       {/* Form */}
@@ -159,61 +159,59 @@ const PaymentSettings = () => {
         </div>
 
         <div className="bg-purple-100 shadow-md">
-  {/* Wrapper for the header and body */}
-  <div className="bg-purple-100 shadow-md h-96 overflow-y-auto">
-  {/* Table Header */}
-  <table className="min-w-full text-left text-gray-700 bg-purple-200">
-    <thead>
-      <tr>
-        <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Name</th>
-        <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">
-          Actions
-        </th>
-      </tr>
-    </thead>
+          {/* Wrapper for the header and body */}
+          <div className="bg-purple-100 shadow-md h-96 overflow-y-auto">
+            {/* Table Header */}
+            <table className="min-w-full text-left text-gray-700 bg-purple-200">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                    Name
+                  </th>
+                  <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
 
+              {/* Scrollable Table Body */}
 
-  {/* Scrollable Table Body */}
+              <tbody>
+                {filteredPaymentMethods.map((method) => (
+                  <tr key={method._id} className="border-t odd:bg-gray-100">
+                    <td className="px-4 py-2">{method.name}</td>
+                    <td className="px-4 py-2 text-center space-x-2">
+                      <button
+                        onClick={() => handleEditPaymentMethod(method)}
+                        className="text-blue-500 hover:text-blue-700">
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => confirmDeletePaymentMethod(method)}
+                        className="text-red-500 hover:text-red-700">
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-      <tbody>
-        {filteredPaymentMethods.map((method) => (
-          <tr key={method._id} className="border-t odd:bg-gray-100">
-            <td className="px-4 py-2">{method.name}</td>
-            <td className="px-4 py-2 text-center space-x-2">
-              <button
-                onClick={() => handleEditPaymentMethod(method)}
-                className="text-blue-500 hover:text-blue-700"
-              >
-                <FaEdit />
-              </button>
-              <button
-                onClick={() => confirmDeletePaymentMethod(method)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <FaTrash />
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            {/* No Categories Found */}
+            {filteredPaymentMethods.length === 0 && (
+              <div className="text-center py-4 text-gray-500">
+                No categories found.
+              </div>
+            )}
+          </div>
 
-
-  {/* No Categories Found */}
-  {filteredPaymentMethods.length === 0 && (
-    <div className="text-center py-4 text-gray-500">No categories found.</div>
-  )}
-</div>
-
-
-  {/* No Categories Found */}
-  {filteredPaymentMethods.length === 0 && (
-    <div className="text-center py-4 text-gray-500">
-      No categories found.
-    </div>
-  )}
-</div>
-
+          {/* No Categories Found */}
+          {filteredPaymentMethods.length === 0 && (
+            <div className="text-center py-4 text-gray-500">
+              No categories found.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Confirmation Modal */}

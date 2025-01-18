@@ -1,7 +1,7 @@
 // components/LoadingAnimation.js
 
-import React from 'react';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import React from "react";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const LoadingAnimation = ({ message = "Loading..." }) => {
   return (
