@@ -4,6 +4,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmationModal from "../components/ConfirmationModal";
+import { API_BASE_URL } from "../secrets";
 
 const CategorySettings = () => {
   const [categories, setCategories] = useState([]);
@@ -15,7 +16,7 @@ const CategorySettings = () => {
   const [showModal, setShowModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-  const CATEGORY_API = "http://localhost:5000/api/categories";
+  const CATEGORY_API = `${API_BASE_URL}categories`;
 
   // Fetch categories
   useEffect(() => {

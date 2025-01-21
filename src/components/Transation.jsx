@@ -9,6 +9,7 @@ import Nav from "../components/Nav";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
 import Clock from "./Clock";
+import { API_BASE_URL } from "../secrets";
 
 
 const Transaction = () => {
@@ -43,10 +44,10 @@ const Transaction = () => {
     const fetchData = async () => {
       try {
         const categoryResponse = await axios.get(
-          "http://localhost:5000/api/categories"
+          `${API_BASE_URL}categories`
         );
         const paymentMethodResponse = await axios.get(
-          "http://localhost:5000/api/payment-methods"
+          `${API_BASE_URL}payment-methods`
         );
         setCategories(categoryResponse.data);
         setPaymentMethods(paymentMethodResponse.data);
@@ -82,13 +83,13 @@ const Transaction = () => {
     const fetchAllData = async () => {
       await Promise.all([
         fetchData(
-          "http://localhost:5000/api/today-reports/debits/today",
+          `${API_BASE_URL}today-reports/debits/today`,
           setDebitAccounts,
           setTotalDebit,
           "totalDebit"
         ),
         fetchData(
-          "http://localhost:5000/api/today-reports/credits/today",
+          `${API_BASE_URL}today-reports/credits/today`,
           setCreditAccounts,
           setTotalCredit,
           "totalCredit"
@@ -101,7 +102,7 @@ const Transaction = () => {
 
   const handleDelete = async () => {
     try {
-      const url = `http://localhost:5000/api/today-reports/${deleteTransaction.type}s/today/${deleteTransaction.id}`;
+      const url = `${API_BASE_URL}today-reports/${deleteTransaction.type}s/today/${deleteTransaction.id}`;
       await axios.delete(url);
       toast.success("Transaction deleted successfully.");
       setFilterSaveTrigger((prev) => prev + 1);
@@ -149,8 +150,8 @@ const Transaction = () => {
     e.preventDefault();
 
     const url = isEditing
-      ? `http://localhost:5000/api/today-reports/${formData.type}s/today/${editId}`
-      : "http://localhost:5000/api/transactions";
+      ? `${API_BASE_URL}today-reports/${formData.type}s/today/${editId}`
+      : `${API_BASE_URL}transactions`;
     try {
       if (isEditing) {
         await axios.put(url, formData);

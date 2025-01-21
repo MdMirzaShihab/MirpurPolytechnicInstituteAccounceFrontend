@@ -20,6 +20,7 @@ import {
 } from "chart.js";
 import { useNavigate } from "react-router-dom";
 import Clock from "./Clock";
+import { API_BASE_URL } from "../secrets";
 
 ChartJS.register(
   ArcElement,
@@ -38,7 +39,7 @@ const Dashboard = () => {
     const fetchAnalytics = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/dashboard/analytics/monthly"
+          `${API_BASE_URL}dashboard/analytics/monthly`
         );
         setAnalytics(response.data);
       } catch (error) {

@@ -8,6 +8,7 @@ import { generatePDF } from "../utils/ReportGeneratorPDF";
 import LoadingAnimation from "./LoadingAnimation";
 import { useNavigate } from "react-router-dom";
 import Clock from "./Clock";
+import { API_BASE_URL } from "../secrets";
 
 
 
@@ -31,9 +32,9 @@ const Report = () => {
   const [totalCredit, setTotalCredit] = useState(0);
   const [totalBalance, setTotalBalance] = useState(0);
 
-  const REPORT_API = "http://localhost:5000/api/reports";
-  const CATEGORY_API = "http://localhost:5000/api/categories";
-  const PAYMENT_METHOD_API = "http://localhost:5000/api/payment-methods";
+  const REPORT_API = `${API_BASE_URL}reports`;
+  const CATEGORY_API = `${API_BASE_URL}categories`;
+  const PAYMENT_METHOD_API = `${API_BASE_URL}payment-methods`;
 
   useEffect(() => {
     // Fetch categories and payment methods on component mount
