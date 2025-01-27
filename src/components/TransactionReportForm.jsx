@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import DatePicker styles
 
 const TransactionReportForm = ({
   filters,
@@ -8,6 +10,8 @@ const TransactionReportForm = ({
   paymentMethods,
   fetchReport,
   loading,
+  error,
+  buttonText
 }) => {
   useEffect(() => {
     // Set the default date range to one month
@@ -34,6 +38,14 @@ const TransactionReportForm = ({
     }));
   };
 
+  const handleDateChange = (name, date) => {
+    // Format the date as YYYY-MM-DD for storage
+    setFilters((prev) => ({
+      ...prev,
+      [name]: date ? date.toISOString().split("T")[0] : "",
+    }));
+  };
+
   const categoryOptions = categories.map((category) => ({
     value: category._id,
     label: category.name,
@@ -56,24 +68,26 @@ const TransactionReportForm = ({
           <label className="block mb-2 text-sm font-medium text-purple-900">
             From
           </label>
-          <input
-            type="date"
-            name="startDate"
-            value={filters.startDate}
-            onChange={handleInputChange}
+          <DatePicker
+            selected={filters.startDate ? new Date(filters.startDate) : null}
+            onChange={(date) => handleDateChange("startDate", date)}
+            dateFormat="dd/MM/yy"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded block w-full p-2 focus:ring-purple-500 focus:border-purple-500"
+            wrapperClassName="w-full" 
+            required
           />
         </div>
         <div>
           <label className="block mb-2 text-sm font-medium text-purple-900">
             To
           </label>
-          <input
-            type="date"
-            name="endDate"
-            value={filters.endDate}
-            onChange={handleInputChange}
+          <DatePicker
+            selected={filters.endDate ? new Date(filters.endDate) : null}
+            onChange={(date) => handleDateChange("endDate", date)}
+            dateFormat="dd/MM/yy"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded block w-full p-2 focus:ring-purple-500 focus:border-purple-500"
+            wrapperClassName="w-full" 
+            required
           />
         </div>
         <div>
@@ -134,7 +148,7 @@ const TransactionReportForm = ({
       <button
         onClick={fetchReport}
         className="w-full mt-8 bg-purple-600 text-white py-2 px-4 rounded shadow-md hover:bg-purple-700 hover:shadow-purple-500 transition-all duration-300">
-        {loading ? "Loading..." : "Generate Report"}
+        {loading ? "Loading..." : `${buttonText}`}
       </button>
     </div>
   );

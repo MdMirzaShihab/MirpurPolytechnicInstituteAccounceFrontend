@@ -1,5 +1,8 @@
 import React from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
+import { format } from "date-fns"; // For formatting the date
 
 const TransactionForm = ({
   formData,
@@ -14,17 +17,22 @@ const TransactionForm = ({
     { value: "debit", label: "Debit" },
   ];
 
-  const categoryOptions = categories
-    .filter((cat) => cat.type.toLowerCase() === formData.type.toLowerCase())
-    .map((cat) => ({
-      value: cat._id,
-      label: cat.name,
-    }));
+  const categoryOptions = categories.map((cat) => ({
+    value: cat._id,
+    label: cat.name,
+  }));
 
   const paymentMethodOptions = paymentMethods.map((method) => ({
     value: method._id,
     label: method.name,
   }));
+
+
+  const handleDateChange = (date) => {
+    handleInputChange({
+      target: { name: "date", value: format(date, "yyyy-MM-dd") }, 
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className=" rounded-lg p-6">
@@ -123,15 +131,13 @@ const TransactionForm = ({
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Date
           </label>
-          <input
-            type="date"
+          <DatePicker
+            selected={formData.date ? new Date(formData.date) : null} // Use formData.date if it's available
+            onChange={handleDateChange} // Update state when the date is changed
+            dateFormat="dd/MM/yy" // Display format for users
             className="bg-gray-50 border border-gray-400 text-gray-900 text-sm rounded-lg block w-full p-2 focus:ring-purple-500 focus:border-purple-500"
-            value={formData.date}
-            onChange={(e) =>
-              handleInputChange({
-                target: { name: "date", value: e.target.value },
-              })
-            }
+            wrapperClassName="w-full" 
+            required
           />
         </div>
       </div>

@@ -125,15 +125,6 @@ const Dashboard = () => {
             <div className="flex-1 p-6 grid gap-6">
               {/* KPI Section */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-red-100 shadow rounded p-4 flex flex-col items-center">
-                  <h2 className="text-lg font-semibold text-gray-700">
-                    Total Debits
-                  </h2>
-                  <p className="text-2xl font-bold text-red-600">
-                    ৳ {analytics.totalDebits.toLocaleString()}
-                  </p>
-                  <AiOutlineArrowDown className="text-red-600 text-xl" />
-                </div>
                 <div className="bg-green-100 shadow rounded p-4 flex flex-col items-center">
                   <h2 className="text-lg font-semibold text-gray-700">
                     Total Credits
@@ -142,6 +133,15 @@ const Dashboard = () => {
                     ৳ {analytics.totalCredits.toLocaleString()}
                   </p>
                   <AiOutlineArrowUp className="text-green-600 text-xl" />
+                </div>
+                <div className="bg-red-100 shadow rounded p-4 flex flex-col items-center">
+                  <h2 className="text-lg font-semibold text-gray-700">
+                    Total Debits
+                  </h2>
+                  <p className="text-2xl font-bold text-red-600">
+                    ৳ {analytics.totalDebits.toLocaleString()}
+                  </p>
+                  <AiOutlineArrowDown className="text-red-600 text-xl" />
                 </div>
                 <div className="bg-yellow-100 shadow rounded p-4 flex flex-col items-center">
                   <h2 className="text-lg font-semibold text-gray-700">

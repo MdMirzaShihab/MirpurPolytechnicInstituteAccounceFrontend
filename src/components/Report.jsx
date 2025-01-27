@@ -122,6 +122,8 @@ const Report = () => {
               paymentMethods={paymentMethods}
               fetchReport={fetchReport}
               loading={loading}
+              buttonText="Generate Report"
+              error={error}
             />
           </div>
           <ReportSummary

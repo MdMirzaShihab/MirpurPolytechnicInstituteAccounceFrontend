@@ -4,6 +4,7 @@ import CategorySettings from "./CategorySettings";
 import PaymentSettings from "./PaymentSettings";
 import { useNavigate } from "react-router-dom";
 import Clock from "./Clock";
+import TransactionSettings from "./TransactionSettings";
 
 
 const Settings = () => {
@@ -17,6 +18,10 @@ const Settings = () => {
     } else if (activeTab === "payment") {
       return <PaymentSettings />;
     }
+    else if (activeTab === "transaction") {
+      return <TransactionSettings />;
+    }
+    
   };
 
   const handleLogout = () => {
@@ -53,16 +58,25 @@ const Settings = () => {
                   : "bg-purple-200 text-gray-800 border-2 border-purple-900"
               }`}
               onClick={() => setActiveTab("category")}>
-              Category Settings
+              Categories
             </button>
             <button
-              className={`px-4 py-2 rounded-e-lg ${
+              className={`px-4 py-2 ${
                 activeTab === "payment"
                   ? "bg-purple-900 text-white font-bold "
                   : "bg-purple-200 text-gray-800 border-2 border-purple-900"
               }`}
               onClick={() => setActiveTab("payment")}>
-              Payment Settings
+              Payment Options
+            </button>
+            <button
+              className={`px-4 py-2 rounded-e-lg ${
+                activeTab === "transaction"
+                  ? "bg-purple-900 text-white font-bold "
+                  : "bg-purple-200 text-gray-800 border-2 border-purple-900"
+              }`}
+              onClick={() => setActiveTab("transaction")}>
+              Transactions
             </button>
           </div>
         </div>
