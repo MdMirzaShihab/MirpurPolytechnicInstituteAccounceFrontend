@@ -5,54 +5,59 @@ export const generatePDF = (
   transactions,
   totalDebit,
   totalCredit,
-  totalBalance
+  totalBalance,
+  transactionsIncludingOpening = null
 ) => {
+  const includeOpeningBalance = transactionsIncludingOpening !== null;
   const doc = new jsPDF("landscape");
 
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
 
-  let startY = 10; // Starting Y position for the content
+  let startY = 10;
   let pageNumber = 1;
+  const headerSpacing = 40;
+  const cellHeight = 10;
 
-  // Add the MPI logo
-  const logoWidth = 20; // Width of the logo
-  const logoHeight = 20; // Height of the logo
-  const logoX = (pageWidth - logoWidth) / 2; // Center the logo horizontally
-
+  // Add MPI Logo
+  const logoWidth = 20,
+    logoHeight = 20;
+  const logoX = (pageWidth - logoWidth) / 2;
   doc.addImage(mpi, "PNG", logoX, startY, logoWidth, logoHeight);
-  startY += logoHeight + 10; // Add some space after the logo
+  startY += logoHeight + 10;
 
-  // Company Info Section
+  // Company Info
   const companyName = "MIRPUR POLYTECHNIC INSTITUTE";
   const companyAddress = "Mukto Bangla Shopping Complex, Mirpur-1, Dhaka-1216";
-  const documentHeader = "Consolidated Statement of Credit-Debit (Academinic)";
+  const documentHeader = "Consolidated Statement of Credit-Debit (Academic)";
 
-  // Set the company name to a larger, bold font
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  const companyNameWidth = doc.getTextWidth(companyName);
-  doc.text(companyName, (pageWidth - companyNameWidth) / 2, startY);
+  doc.setFont("helvetica", "bold").setFontSize(20);
+  doc.text(
+    companyName,
+    (pageWidth - doc.getTextWidth(companyName)) / 2,
+    startY
+  );
   startY += 6;
 
-  // Set a smaller, regular font for the address
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  const companyAddressWidth = doc.getTextWidth(companyAddress);
-  doc.text(companyAddress, (pageWidth - companyAddressWidth) / 2, startY);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(
+    companyAddress,
+    (pageWidth - doc.getTextWidth(companyAddress)) / 2,
+    startY
+  );
   startY += 10;
 
-  // Set the company name to a larger, bold font
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  const documentHeaderWidth = doc.getTextWidth(documentHeader);
-  doc.text(documentHeader, (pageWidth - documentHeaderWidth) / 2, startY);
+  doc.setFont("helvetica", "bold").setFontSize(16);
+  doc.text(
+    documentHeader,
+    (pageWidth - doc.getTextWidth(documentHeader)) / 2,
+    startY
+  );
   startY += 10;
 
-  // Add some space before the summary table
-  startY += 10;
+  startY += 10; // Space before table
 
-  // Transaction Table Header
+  // Table Headers
   const headers = [
     "Date",
     "Type",
@@ -61,37 +66,30 @@ export const generatePDF = (
     "Remarks",
     "Amount",
   ];
-  const headerSpacing = 40; // Spacing between each column
-  const cellHeight = 10; // Height of each cell
-
-  // Calculate the total width of the header (using headerSpacing)
   const totalWidth = headerSpacing * headers.length;
-  const startX = (pageWidth - totalWidth) / 2; // Start position for the table
+  const startX = (pageWidth - totalWidth) / 2;
 
-  // Draw Table Header (Bold)
-  doc.setFont("helvetica", "bold"); // Set headers to bold font
-  doc.setFontSize(12); // Set font size for the headers
+  doc.setFont("helvetica", "bold").setFontSize(12);
   headers.forEach((header, index) => {
     const xPos = startX + index * headerSpacing;
-    const headerWidth = doc.getTextWidth(header);
-    // Draw the header box
     doc.rect(xPos, startY, headerSpacing, cellHeight);
-    // Center the header text inside the box
-    doc.text(header, xPos + (headerSpacing - headerWidth) / 2, startY + 6);
+    doc.text(
+      header,
+      xPos + (headerSpacing - doc.getTextWidth(header)) / 2,
+      startY + 6
+    );
   });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-  // Check if there are transactions, if not, display "No Data" message
+
+  doc.setFont("helvetica", "normal").setFontSize(12);
+  startY += cellHeight;
+
   if (transactions.length === 0) {
-    startY += cellHeight;
     doc.text(
       "No Data Available",
       (pageWidth - doc.getTextWidth("No Data Available")) / 2,
       startY + 6
     );
   } else {
-    // Table Rows
-    startY += cellHeight; // Move down to the next row
     transactions.forEach((transaction, rowIndex) => {
       const rowData = [
         new Date(transaction.date).toLocaleDateString("en-GB"),
@@ -102,65 +100,66 @@ export const generatePDF = (
         transaction.amount.toLocaleString("en-GB"),
       ];
 
-      // Calculate the maximum height required for the row
       let rowHeight = cellHeight;
       const wrappedRowData = rowData.map((data, index) => {
-        const cellWidth = headerSpacing - 4; // Slightly smaller to account for padding
-        const wrappedText = doc.splitTextToSize(data, cellWidth); // Wrap text to fit cell width
-        const requiredHeight = wrappedText.length * 6; // Estimate height (6px per line of text)
-        rowHeight = Math.max(rowHeight, requiredHeight); // Adjust row height for the tallest cell
-        return wrappedText; // Return wrapped text for drawing
+        const wrappedText = doc.splitTextToSize(data, headerSpacing - 4);
+        rowHeight = Math.max(rowHeight, wrappedText.length * 6);
+        return wrappedText;
       });
 
-      // Draw the cells with the wrapped text
       wrappedRowData.forEach((wrappedText, index) => {
         const xPos = startX + index * headerSpacing;
-        doc.rect(xPos, startY, headerSpacing, rowHeight); // Draw the cell box
-
+        doc.rect(xPos, startY, headerSpacing, rowHeight);
         wrappedText.forEach((line, lineIndex) => {
-          const yPos = startY + 6 + lineIndex * 4; // Position each line within the cell
-
-          // Check if this is the "Amount" column
+          const yPos = startY + 6 + lineIndex * 4;
           if (headers[index] === "Amount") {
-            const textWidth = doc.getTextWidth(line); // Calculate the text width
-            doc.text(line, xPos + headerSpacing - textWidth - 2, yPos); // Align right with padding
+            const textWidth = doc.getTextWidth(line);
+            doc.text(line, xPos + headerSpacing - textWidth - 2, yPos);
           } else {
-            doc.text(line, xPos + 2, yPos); // Default left-aligned text
+            doc.text(line, xPos + 2, yPos);
           }
         });
       });
 
-      startY += rowHeight; // Move to the next row
+      startY += rowHeight;
 
-      // Check if a new page is needed
+      // **Check for new page**
       if (startY + cellHeight > pageHeight - 30) {
         doc.addPage();
-        startY = 30; // Reset startY after adding a new page
+        startY = 30;
         pageNumber++;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
 
-        // Re-draw headers on the new page
-        startY += 10;
-        doc.setFont("helvetica", "bold"); // Set headers to bold font
-        doc.setFontSize(12); // Set font size for the headers
+        // **Brand Name on Each Page**
+        const brandName = "Nexx-Vantage";
+        const brandFontSize = 8;
+        const footerY = pageHeight - 10;
+        doc.setFont("helvetica", "normal").setFontSize(brandFontSize);
+        doc.setTextColor(100, 100, 100, 0.5 * 255);
+        doc.text(
+          brandName,
+          (pageWidth - doc.getTextWidth(brandName)) / 2,
+          footerY
+        );
+        doc.setTextColor(0, 0, 0);
+
+        // Page Number
+        doc.setFont("helvetica", "normal").setFontSize(10);
+        doc.text(`Page ${pageNumber}`, pageWidth - 40, pageHeight - 15);
+
+        // **Re-draw Headers**
+        doc.setFont("helvetica", "bold").setFontSize(12);
         headers.forEach((header, index) => {
           const xPos = startX + index * headerSpacing;
-          const headerWidth = doc.getTextWidth(header);
-          // Draw the header box again
           doc.rect(xPos, startY, headerSpacing, cellHeight);
-          // Center the header text inside the box
           doc.text(
             header,
-            xPos + (headerSpacing - headerWidth) / 2,
+            xPos + (headerSpacing - doc.getTextWidth(header)) / 2,
             startY + 6
           );
         });
-        // Reset font for rows
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        startY += cellHeight; // Move to the next row after header
+
+        doc.setFont("helvetica", "normal").setFontSize(10);
+        startY += cellHeight;
       }
     });
   }
@@ -168,16 +167,35 @@ export const generatePDF = (
   // Add space before the summary table
   startY += 10;
 
-  // Total Debit and Credit Table
-  const summaryHeaders = ["Total Debit", "Total Credit", "Total Balance"];
-  const summaryData = [
-    `${totalDebit.toLocaleString("en-GB")}`,
-    `${totalCredit.toLocaleString("en-GB")}`,
-    `${totalBalance.toLocaleString("en-GB")}`,
-  ];
+  // Conditionally include "Opening Balance" in headers and data
+  const summaryHeaders = includeOpeningBalance
+    ? ["Total Credit", "Total Debit", "Total Balance", "Net Balance"]
+    : ["Total Credit", "Total Debit", "Total Balance"];
 
+  const summaryData = includeOpeningBalance
+    ? [
+        `${totalCredit.toLocaleString("en-GB")}`,
+        `${totalDebit.toLocaleString("en-GB")}`,
+        `${totalBalance.toLocaleString("en-GB")}`,
+        `${transactionsIncludingOpening.toLocaleString("en-GB")}`,
+      ]
+    : [
+        `${totalCredit.toLocaleString("en-GB")}`,
+        `${totalDebit.toLocaleString("en-GB")}`,
+        `${totalBalance.toLocaleString("en-GB")}`,
+      ];
+
+  // Adjust the summary start position based on columns in the transaction table
   const summaryCellHeight = 10;
-  const summaryStartX = startX + headerSpacing * summaryHeaders.length;
+  let summaryStartX;
+
+  if (includeOpeningBalance) {
+    // Align summary with the last 4 columns
+    summaryStartX = startX + headerSpacing * 2; // Adjust this value to shift the summary correctly
+  } else {
+    // Align summary with the last 3 columns
+    summaryStartX = startX + headerSpacing * 3; // Adjust this value to shift the summary correctly
+  }
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
@@ -206,11 +224,10 @@ export const generatePDF = (
     );
   });
 
-  // Final page footer
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(`Page ${pageNumber}`, pageWidth - 30, pageHeight - 20);
+  // **Final Page Number (Last Page)**
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(`Page ${pageNumber}`, pageWidth - 40, pageHeight - 15); // Adjusted to prevent overlap
 
-  // Save the PDF
+  // **Save the PDF**
   doc.save("transaction_report.pdf");
 };

@@ -10,10 +10,10 @@ const TodayCredit = ({
     data.map((transaction) => (
       <tr key={transaction._id} className="bg-white border-b hover:bg-gray-50">
         <td className="px-6 py-4">{transaction.category.name}</td>
-        <td className="px-6 py-4 text-end">{transaction.amount}</td>
         <td className="px-6 py-4 text-center">
           {transaction.paymentMethod.name}
         </td>
+        <td className="px-6 py-4 text-end">{transaction.amount.toLocaleString()}</td>
         <td className="px-6 py-4 flex justify-center gap-2">
           <button
             onClick={() => handleEdit(transaction, transaction.type)}
@@ -39,32 +39,42 @@ const TodayCredit = ({
           <thead className="text-xs uppercase text-white bg-red-500">
             <tr>
               <th className="px-6 py-3">Account Head</th>
-              <th className="px-6 py-3 text-center">Amount</th>
               <th className="px-6 py-3 text-center">Payment Method</th>
+              <th className="px-6 py-3 text-center">Amount</th>
               <th className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {creditAccounts.length > 0 ? (
-              renderTableRows(creditAccounts)
-            ) : (
-              <tr>
-                <td
-                  colSpan="4"
-                  className="text-center px-6 py-4 text-gray-500 italic">
-                  No credit accounts available
-                </td>
-              </tr>
-            )}
-          </tbody>
+        </table>
+        <div className="flex overflow-y-auto h-64">
+          {/* To make the tbody scrollable */}
+          <table className="w-full table-fixed">
+            <tbody>
+              {creditAccounts.length > 0 ? (
+                renderTableRows(creditAccounts)
+              ) : (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="text-center px-6 py-4 text-gray-500 italic">
+                    No credit accounts available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <table className="w-full table-fixed">
           <tfoot>
             <tr className="bg-gray-100">
-              <td colSpan="3" className="px-6 py-4 font-bold text-gray-700">
+              <td colSpan="2" className="px-6 py-4 font-bold text-gray-700">
                 Total Credit
               </td>
-              <td className="px-6 py-4 font-bold text-end text-gray-700">
-                {totalCredit}
+              <td className="py-4 px-6 font-bold text-end text-gray-700">
+                ৳ {totalCredit.toLocaleString()}
               </td>
+              <td
+                colSpan="1"
+                className="text-center py-4 px-6 text-gray-500 italic"></td>
             </tr>
           </tfoot>
         </table>

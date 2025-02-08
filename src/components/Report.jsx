@@ -7,13 +7,9 @@ import TransactionsTable from "./TransactionsTable";
 import { generatePDF } from "../utils/ReportGeneratorPDF";
 import LoadingAnimation from "./LoadingAnimation";
 import { useNavigate } from "react-router-dom";
-import Clock from "./Clock";
 import { API_BASE_URL } from "../secrets";
 
-
-
 const Report = () => {
-
   const navigate = useNavigate();
   const [filters, setFilters] = useState({
     type: "",
@@ -31,8 +27,13 @@ const Report = () => {
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
   const [totalBalance, setTotalBalance] = useState(0);
+  const [transactionsIncludingOpening, setTransactionsIncludingOpening] =
+    useState(0);
+  const [loadingTotalBalance, setLoadingTotalBalance] = useState(false);
+  const [includeOpeningBalance, setIncludeOpeningBalance] = useState(false);
 
   const REPORT_API = `${API_BASE_URL}reports`;
+  const TOTAL_BALANCE_API = `${API_BASE_URL}reports/total-balance`;
   const CATEGORY_API = `${API_BASE_URL}categories`;
   const PAYMENT_METHOD_API = `${API_BASE_URL}payment-methods`;
 
@@ -72,6 +73,7 @@ const Report = () => {
       setTotalDebit(totalDebit);
       setTotalCredit(totalCredit);
       setTotalBalance(totalBalance);
+      fetchTotalBalance();
     } catch (error) {
       setError("Error fetching report data. Please try again.");
     } finally {
@@ -79,70 +81,74 @@ const Report = () => {
     }
   };
 
-  const handlePrint = () => {
-    generatePDF(transactions, totalDebit, totalCredit, totalBalance);
+  const fetchTotalBalance = async () => {
+    setLoadingTotalBalance(true);
+    try {
+      const response = await axios.get(TOTAL_BALANCE_API, {
+        params: {
+          endDate: filters.endDate,
+        },
+      });
+      setTransactionsIncludingOpening(
+        response.data.totalBalanceIncludingOpening
+      );
+    } catch (error) {
+      console.error("Error fetching total balance:", error);
+    } finally {
+      setLoadingTotalBalance(false);
+    }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("isLoggedIn");
-    navigate("/");
+  const handlePrint = () => {
+    generatePDF(
+      transactions,
+      totalDebit,
+      totalCredit,
+      totalBalance,
+      includeOpeningBalance ? transactionsIncludingOpening : null
+    );
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div
-        className={` bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}>
-        <Nav />
+    <div className="pl-16 md:pl-0">
+      <div className="bg-purple-200 mt-8 p-4 rounded-lg shadow-lg">
+        <h1 className="text-3xl text-center text-purple-800 font-bold">
+          Transaction Report
+        </h1>
+        <TransactionReportForm
+          filters={filters}
+          setFilters={setFilters}
+          categories={categories}
+          paymentMethods={paymentMethods}
+          fetchReport={fetchReport}
+          loading={loading}
+          buttonText="Generate Report"
+          error={error}
+        />
       </div>
-
-      {/* Main Content */}
-      <div className="flex-1  flex flex-col ">
-        {/* Navbar */}
-        <div className="bg-purple-900 text-white px-4 py-2 flex justify-between">
-          <Clock />
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-500 text-white py-1 px-4 rounded-lg">
-            Logout
-          </button>
-        </div>
-
-        {/* Content Area */}
-
-        <main className="p-6 bg-gray-100 flex-1">
-          <div className="bg-purple-200 p-6 rounded-lg shadow-lg">
-            <h1 className="text-3xl text-center text-purple-800 font-bold">
-              Transaction Report
-            </h1>
-            <TransactionReportForm
-              filters={filters}
-              setFilters={setFilters}
-              categories={categories}
-              paymentMethods={paymentMethods}
-              fetchReport={fetchReport}
-              loading={loading}
-              buttonText="Generate Report"
-              error={error}
-            />
-          </div>
-          <ReportSummary
-            totalDebit={totalDebit}
-            totalCredit={totalCredit}
-            totalBalance={totalBalance}
+      <ReportSummary
+        totalDebit={totalDebit}
+        totalCredit={totalCredit}
+        totalBalance={totalBalance}
+        transactionsIncludingOpening={transactionsIncludingOpening}
+        loadingTotalBalance={loadingTotalBalance}
+      />
+      <div className="">
+        {loading ? (
+          <LoadingAnimation message="Fetching data..." />
+        ) : transactions.length > 0 ? (
+          <TransactionsTable
+            transactions={transactions}
+            handlePrint={handlePrint}
+            includeOpeningBalance={includeOpeningBalance}
+            setIncludeOpeningBalance={setIncludeOpeningBalance}
+            loadingTotalBalance={loadingTotalBalance}
           />
-          <div className="">
-            {loading ? (
-              <LoadingAnimation message="Fetching data..." />
-            ) : transactions.length > 0 ? (
-              <TransactionsTable transactions={transactions} handlePrint={handlePrint} />
-            ) : (
-              <p className="text-center text-gray-500 mt-10">
-                No transactions available for the selected filters.
-              </p>
-            )}
-          </div>
-        </main>
+        ) : (
+          <p className="text-center text-gray-500 mt-10">
+            No transactions available for the selected filters.
+          </p>
+        )}
       </div>
     </div>
   );

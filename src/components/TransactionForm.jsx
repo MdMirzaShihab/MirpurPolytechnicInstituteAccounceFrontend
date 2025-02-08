@@ -2,7 +2,7 @@ import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
-import { format } from "date-fns"; // For formatting the date
+import { format } from "date-fns";
 
 const TransactionForm = ({
   formData,
@@ -35,10 +35,9 @@ const TransactionForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className=" rounded-lg p-6">
+    <form onSubmit={handleSubmit} className=" rounded-lg p-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Account Type */}
-
         <div className="">
           <label className="block mb-2 text-sm font-medium text-purple-900">
             Account Type

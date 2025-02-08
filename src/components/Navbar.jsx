@@ -18,7 +18,7 @@ const Navbar = () => {
       {/* Sidebar */}
       <div
         className={`${
-          sidebarOpen ? "w-64" : "w-16"
+          sidebarOpen ? "w-64" : "w-20"
         } bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300`}>
         <Nav />
       </div>

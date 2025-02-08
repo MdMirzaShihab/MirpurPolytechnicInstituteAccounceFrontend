@@ -21,7 +21,7 @@ const TransactionReportForm = ({
 
     setFilters((prev) => ({
       ...prev,
-      startDate: oneMonthAgo.toISOString().split("T")[0], // Format as YYYY-MM-DD
+      startDate: oneMonthAgo.toISOString().split("T")[0], 
       endDate: today.toISOString().split("T")[0],
     }));
   }, [setFilters]);
@@ -147,7 +147,7 @@ const TransactionReportForm = ({
       </div>
       <button
         onClick={fetchReport}
-        className="w-full mt-8 bg-purple-600 text-white py-2 px-4 rounded shadow-md hover:bg-purple-700 hover:shadow-purple-500 transition-all duration-300">
+        className="w-full mt-6 mb-4 bg-purple-600 text-white py-2 px-4 rounded shadow-md hover:bg-purple-700 hover:shadow-purple-500 transition-all duration-300">
         {loading ? "Loading..." : `${buttonText}`}
       </button>
     </div>

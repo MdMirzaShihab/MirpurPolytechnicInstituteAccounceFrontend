@@ -41,8 +41,6 @@ const TransactionSettings = () => {
   const CATEGORY_API = `${API_BASE_URL}categories`;
   const PAYMENT_METHOD_API = `${API_BASE_URL}payment-methods`;
 
-
-
   const fetchReport = async () => {
     setLoading(true);
     setError("");
@@ -82,7 +80,6 @@ const TransactionSettings = () => {
     fetchInitialData();
     fetchReport();
   }, []);
-
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -143,70 +140,83 @@ const TransactionSettings = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-7xl mx-auto">
+    <div className=" w-sc">
       <ToastContainer />
-
-      {showDeleteModal && (
-        <ConfirmationModal
-          onConfirm={handleDelete}
-          onCancel={() => setShowDeleteModal(false)}
-          message="Are you sure you want to delete this transaction?"
-        />
-      )}
-
-      {showEditModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-7xl w-full">
-            <h2 className="text-2xl font-semibold mb-4">Edit Transaction</h2>
-            <TransactionForm
-              formData={formData}
-              categories={categories}
-              paymentMethods={paymentMethods}
-              handleInputChange={handleInputChange}
-              handleSelectChange={handleSelectChange}
-              handleSubmit={handleSubmit}
-            />
-            <div className="mt-4 text-right">
-              <button
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-                onClick={() => setShowEditModal(false)}>
-                Close
-              </button>
+      <div className="bg-gray-100 rounded-lg shadow-lg max-w-7xl mx-auto">
+        {showDeleteModal && (
+          <ConfirmationModal
+            onConfirm={handleDelete}
+            onCancel={() => setShowDeleteModal(false)}
+            message="Are you sure you want to delete this transaction?"
+          />
+        )}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-7xl w-full">
+              <h2 className="text-2xl font-semibold mb-4">Edit Transaction</h2>
+              <TransactionForm
+                formData={formData}
+                categories={categories}
+                paymentMethods={paymentMethods}
+                handleInputChange={handleInputChange}
+                handleSelectChange={handleSelectChange}
+                handleSubmit={handleSubmit}
+              />
+              <div className="mt-4 text-right">
+                <button
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  onClick={() => setShowEditModal(false)}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
+        )}
+
+        <div className="relative bg-purple-200 rounded-lg shadow-lg z-20">
+          <TransactionReportForm
+            filters={filters}
+            setFilters={setFilters}
+            categories={categories}
+            paymentMethods={paymentMethods}
+            fetchReport={fetchReport}
+            loading={loading}
+            buttonText="View Transactions"
+            error={error}
+          />
         </div>
-      )}
-
-      <div className="relative bg-purple-200 p-6 rounded-lg shadow-lg z-20">
-        <TransactionReportForm
-          filters={filters}
-          setFilters={setFilters}
-          categories={categories}
-          paymentMethods={paymentMethods}
-          fetchReport={fetchReport}
-          loading={loading}
-          buttonText="View Transactions"
-          error={error}
-        />
       </div>
-
-      <div className="mt-6 bg-purple-100 shadow-md">
+      <div className="mt-6 bg-purple-100 rounded-xl shadow-md">
         {loading ? (
           <LoadingAnimation message="Fetching data..." />
         ) : (
-          <div className="mt-6">
+          <div className="">
             <div className="bg-purple-100 shadow-md">
-              <div className="h-96 overflow-y-auto">
+              <div className="h-96 w-full overflow-auto">
                 <table className="min-w-full text-left text-gray-700">
                   <thead className="bg-purple-200">
                     <tr>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Type</th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Category</th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Amount</th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Payment Method</th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Date</th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Remarks</th>
-                      <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">Actions</th>
+                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                        Type
+                      </th>
+                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                        Category
+                      </th>
+                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                        Amount
+                      </th>
+                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                        Payment Method
+                      </th>
+                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                        Date
+                      </th>
+                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
+                        Remarks
+                      </th>
+                      <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -215,9 +225,13 @@ const TransactionSettings = () => {
                         key={transaction._id}
                         className="border-t odd:bg-gray-50">
                         <td className="px-4 py-2">{transaction.type}</td>
-                        <td className="px-4 py-2">{transaction.category.name}</td>
+                        <td className="px-4 py-2">
+                          {transaction.category.name}
+                        </td>
                         <td className="px-4 py-2">{transaction.amount}</td>
-                        <td className="px-4 py-2">{transaction.paymentMethod.name}</td>
+                        <td className="px-4 py-2">
+                          {transaction.paymentMethod.name}
+                        </td>
                         <td className="px-4 py-2">
                           {new Date(transaction.date).toLocaleDateString()}
                         </td>

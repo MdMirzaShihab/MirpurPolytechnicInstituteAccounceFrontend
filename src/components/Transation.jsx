@@ -10,10 +10,9 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
 import Clock from "./Clock";
 import { API_BASE_URL } from "../secrets";
-
+import DateComponent from "./DateComponent";
 
 const Transaction = () => {
-  
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     type: "",
@@ -43,9 +42,7 @@ const Transaction = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoryResponse = await axios.get(
-          `${API_BASE_URL}categories`
-        );
+        const categoryResponse = await axios.get(`${API_BASE_URL}categories`);
         const paymentMethodResponse = await axios.get(
           `${API_BASE_URL}payment-methods`
         );
@@ -176,75 +173,50 @@ const Transaction = () => {
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("isLoggedIn");
-    navigate("/");
-  };
-
   return (
-    <div className="flex h-screen">
+    <div className="pl-16">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-
-      {/* Confirmation Modal */}
-      {showModal && (
-        <ConfirmationModal
-          onConfirm={handleDelete}
-          onCancel={() => setShowModal(false)}
-          message="Are you sure you want to delete this transaction?"
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className="bg-purple-900 text-white h-screen text-[14px] w-60 transition-width duration-300">
-        <Nav />
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Navbar */}
-        <div className="bg-purple-900 text-white px-4 py-2 flex justify-between">
-          <Clock />
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-500 text-white py-1 px-4 rounded-lg">
-            Logout
-          </button>
+      <div className=" space-y-6">
+        {/* Confirmation Modal */}
+        {showModal && (
+          <ConfirmationModal
+            onConfirm={handleDelete}
+            onCancel={() => setShowModal(false)}
+            message="Are you sure you want to delete this transaction?"
+          />
+        )}
+        {/* Transaction Form */}
+        <div className="bg-purple-200 shadow-lg mt-6 shadow-purple-300 rounded-lg p-6">
+          <h2 className="text-3xl font-bold text-center text-purple-800 mb-4">
+            Create or Edit Transaction
+          </h2>
+          <TransactionForm
+            formData={formData}
+            categories={categories}
+            paymentMethods={paymentMethods}
+            handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
+            handleSubmit={handleSubmit}
+          />
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Transaction Form */}
-          <div className="bg-purple-200 shadow-lg shadow-purple-300 rounded-lg p-6">
-            <h2 className="text-3xl font-bold text-center text-purple-800 mb-4">
-              Create or Edit Transaction
-            </h2>
-            <TransactionForm
-              formData={formData}
-              categories={categories}
-              paymentMethods={paymentMethods}
-              handleInputChange={handleInputChange}
-              handleSelectChange={handleSelectChange}
-              handleSubmit={handleSubmit}
+        {/* Today’s Debit and Credit Reports */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-red-100 shadow-lg rounded-lg shadow-red-300 p-6">
+            <TodayCredit
+              creditAccounts={creditAccounts}
+              totalCredit={totalCredit}
+              handleDelete={(id) => confirmDelete(id, "credit")}
+              handleEdit={(transaction) => handleEdit(transaction, "credit")}
             />
           </div>
-
-          {/* Today’s Debit and Credit Reports */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-blue-100 shadow-lg rounded-lg shadow-blue-300 p-6">
-              <TodayDebit
-                debitAccounts={debitAccounts}
-                totalDebit={totalDebit}
-                handleDelete={(id) => confirmDelete(id, "debit")}
-                handleEdit={(transaction) => handleEdit(transaction, "debit")}
-              />
-            </div>
-            <div className="bg-red-100 shadow-lg rounded-lg shadow-red-300 p-6">
-              <TodayCredit
-                creditAccounts={creditAccounts}
-                totalCredit={totalCredit}
-                handleDelete={(id) => confirmDelete(id, "credit")}
-                handleEdit={(transaction) => handleEdit(transaction, "credit")}
-              />
-            </div>
+          <div className="bg-blue-100 shadow-lg rounded-lg shadow-blue-300 p-6">
+            <TodayDebit
+              debitAccounts={debitAccounts}
+              totalDebit={totalDebit}
+              handleDelete={(id) => confirmDelete(id, "debit")}
+              handleEdit={(transaction) => handleEdit(transaction, "debit")}
+            />
           </div>
         </div>
       </div>

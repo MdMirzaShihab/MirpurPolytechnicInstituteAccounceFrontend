@@ -116,9 +116,9 @@ const PaymentSettings = () => {
             ? "Edit Payment Method"
             : "Create Payment Method"}
         </h2>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Name Input */}
-          <div className="col-span-3">
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-600">
               Payment Method
             </label>
@@ -133,7 +133,7 @@ const PaymentSettings = () => {
           </div>
 
           {/* Action Button */}
-          <div className="flex items-end">
+          <div className="flex items-end justify-center md:justify-start">
             <button
               type="submit"
               className="bg-blue-600 text-white py-2 px-6 rounded-lg shadow hover:bg-blue-700">
@@ -198,20 +198,13 @@ const PaymentSettings = () => {
               </tbody>
             </table>
 
-            {/* No Categories Found */}
+            {/* No Payment Methods Found */}
             {filteredPaymentMethods.length === 0 && (
               <div className="text-center py-4 text-gray-500">
-                No categories found.
+                No payment methods found.
               </div>
             )}
           </div>
-
-          {/* No Categories Found */}
-          {filteredPaymentMethods.length === 0 && (
-            <div className="text-center py-4 text-gray-500">
-              No categories found.
-            </div>
-          )}
         </div>
       </div>
 

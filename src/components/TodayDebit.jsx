@@ -10,10 +10,10 @@ const TodayDebit = ({
     data.map((transaction) => (
       <tr key={transaction._id} className="bg-white border-b hover:bg-gray-50">
         <td className="px-6 py-4">{transaction.category.name}</td>
-        <td className="px-6 py-4 text-end">{transaction.amount}</td>
         <td className="px-6 py-4 text-center">
           {transaction.paymentMethod.name}
         </td>
+        <td className="px-6 py-4 text-end">{transaction.amount.toLocaleString()}</td>
         <td className="px-6 py-4 flex justify-center gap-2">
           <button
             onClick={() => handleEdit(transaction, transaction.type)}
@@ -39,11 +39,15 @@ const TodayDebit = ({
           <thead className="text-xs uppercase text-white bg-blue-500">
             <tr>
               <th className="px-6 py-3">Account Head</th>
-              <th className="px-6 py-3 text-center">Amount</th>
               <th className="px-6 py-3 text-center">Payment Method</th>
+              <th className="px-6 py-3 text-center">Amount</th>
               <th className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
+          </table>
+        <div className="flex overflow-y-auto h-64">
+          {/* To make the tbody scrollable */}
+          <table className="w-full table-fixed">
           <tbody>
             {debitAccounts.length > 0 ? (
               renderTableRows(debitAccounts)
@@ -57,14 +61,21 @@ const TodayDebit = ({
               </tr>
             )}
           </tbody>
+
+          </table>
+        </div>
+        <table className="w-full table-fixed">
           <tfoot>
             <tr className="bg-gray-100">
-              <td colSpan="3" className="px-6 py-4 font-bold text-gray-700">
+              <td colSpan="2" className="px-6 py-4 font-bold text-gray-700">
                 Total Debit
               </td>
               <td className="px-6 py-4 font-bold text-gray-700 text-end">
-                {totalDebit}
+              ৳ {totalDebit.toLocaleString()}
               </td>
+              <td
+                colSpan="1"
+                className="text-center py-4 text-gray-500 italic"></td>
             </tr>
           </tfoot>
         </table>

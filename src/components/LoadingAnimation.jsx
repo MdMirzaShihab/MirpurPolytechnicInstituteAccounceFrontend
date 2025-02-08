@@ -1,11 +1,9 @@
-// components/LoadingAnimation.js
-
 import React from "react";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const LoadingAnimation = ({ message = "Loading..." }) => {
   return (
-    <div className="flex justify-center items-center w-full h-96">
+    <div className="flex justify-center items-center w-full h-full">
       <div className="flex flex-col items-center">
         <AiOutlineLoading3Quarters
           className="text-purple-600 animate-spin text-6xl mb-4"
