@@ -111,7 +111,7 @@ const Report = () => {
 
   return (
     <div className="pl-16 md:pl-0">
-      <div className="bg-purple-200 mt-8 p-4 rounded-lg shadow-lg">
+      <div className="bg-purple-200 max-w-7xl mx-auto mt-8 p-4 rounded-lg shadow-lg">
         <h1 className="text-3xl text-center text-purple-800 font-bold">
           Transaction Report
         </h1>
@@ -133,7 +133,7 @@ const Report = () => {
         transactionsIncludingOpening={transactionsIncludingOpening}
         loadingTotalBalance={loadingTotalBalance}
       />
-      <div className="">
+      <div className=" max-w-7xl mx-auto">
         {loading ? (
           <LoadingAnimation message="Fetching data..." />
         ) : transactions.length > 0 ? (

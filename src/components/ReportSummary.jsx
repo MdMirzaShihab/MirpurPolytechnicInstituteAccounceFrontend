@@ -10,7 +10,7 @@ const ReportSummary = ({
   loadingTotalBalance,
 }) => (
   <div className="mx-auto max-w-7xl">
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 m-6 bg-gray-100 ">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 m-6 ">
       <div className="flex items-center justify-between bg-green-100 border-green-300 shadow-green-400 border  p-4 rounded-lg shadow-md ">
         <div>
           <h3 className="text-lg font-medium text-gray-600">Total Credit</h3>

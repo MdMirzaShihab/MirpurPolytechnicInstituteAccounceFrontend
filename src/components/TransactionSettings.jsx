@@ -140,9 +140,9 @@ const TransactionSettings = () => {
   };
 
   return (
-    <div className=" w-sc">
+    <div className=" md:w-full w-screen md:ml-0 md:pl-0 -ml-20 pl-24 p-4">
       <ToastContainer />
-      <div className="bg-gray-100 rounded-lg shadow-lg max-w-7xl mx-auto">
+      <div className="bg-gray-100 rounded-lg max-w-7xl mx-auto shadow-lg ">
         {showDeleteModal && (
           <ConfirmationModal
             onConfirm={handleDelete}
@@ -186,83 +186,47 @@ const TransactionSettings = () => {
           />
         </div>
       </div>
-      <div className="mt-6 bg-purple-100 rounded-xl shadow-md">
-        {loading ? (
-          <LoadingAnimation message="Fetching data..." />
-        ) : (
-          <div className="">
-            <div className="bg-purple-100 shadow-md">
-              <div className="h-96 w-full overflow-auto">
-                <table className="min-w-full text-left text-gray-700">
-                  <thead className="bg-purple-200">
-                    <tr>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
-                        Type
-                      </th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
-                        Category
-                      </th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
-                        Amount
-                      </th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
-                        Payment Method
-                      </th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
-                        Date
-                      </th>
-                      <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">
-                        Remarks
-                      </th>
-                      <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((transaction) => (
-                      <tr
-                        key={transaction._id}
-                        className="border-t odd:bg-gray-50">
-                        <td className="px-4 py-2">{transaction.type}</td>
-                        <td className="px-4 py-2">
-                          {transaction.category.name}
-                        </td>
-                        <td className="px-4 py-2">{transaction.amount}</td>
-                        <td className="px-4 py-2">
-                          {transaction.paymentMethod.name}
-                        </td>
-                        <td className="px-4 py-2">
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </td>
+      <div className="mt-6 max-w-7xl mx-auto rounded-xl shadow-md">
+  <div className="overflow-auto h-96">
+    <table className="w-full min-w-max text-left text-gray-700 bg-purple-100">
+      <thead>
+        <tr>
+          <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Type</th>
+          <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Category</th>
+          <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Amount</th>
+          <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Payment Method</th>
+          <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Date</th>
+          <th className="px-4 py-2 sticky top-0 z-10 bg-purple-200">Remarks</th>
+          <th className="px-4 py-2 text-center sticky top-0 z-10 bg-purple-200">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.map((transaction) => (
+          <tr key={transaction._id} className="border-t odd:bg-gray-50">
+            <td className="px-4 py-2">{transaction.type}</td>
+            <td className="px-4 py-2">{transaction.category.name}</td>
+            <td className="px-4 py-2">{transaction.amount}</td>
+            <td className="px-4 py-2">{transaction.paymentMethod.name}</td>
+            <td className="px-4 py-2">{new Date(transaction.date).toLocaleDateString()}</td>
+            <td className="px-4 py-2">{transaction.remarks}</td>
+            <td className="px-4 py-2 text-center space-x-2">
+              <button className="text-blue-500 hover:text-blue-700" onClick={() => handleEdit(transaction)}>
+                <FaEdit />
+              </button>
+              <button className="text-red-500 hover:text-red-700" onClick={() => confirmDelete(transaction._id)}>
+                <FaTrash />
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {transactions.length === 0 && (
+      <div className="text-center py-4 text-gray-500">No transactions found.</div>
+    )}
+  </div>
+</div>
 
-                        <td className="px-4 py-2">{transaction.remarks}</td>
-                        <td className="px-4 py-2 text-center space-x-2">
-                          <button
-                            className="text-blue-500 hover:text-blue-700"
-                            onClick={() => handleEdit(transaction)}>
-                            <FaEdit />
-                          </button>
-                          <button
-                            className="text-red-500 hover:text-red-700"
-                            onClick={() => confirmDelete(transaction._id)}>
-                            <FaTrash />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {transactions.length === 0 && (
-                <div className="text-center py-4 text-gray-500">
-                  No transactions found.
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

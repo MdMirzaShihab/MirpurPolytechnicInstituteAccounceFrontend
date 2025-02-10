@@ -17,7 +17,6 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
-import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../secrets";
 
 ChartJS.register(
@@ -87,97 +86,94 @@ const Dashboard = () => {
     : {};
 
   return (
-    <div className="p-6">
-      <h2 className="text-3xl font-bold text-center text-purple-800 mt-4">
+    <div className="pl-16 md:pl-0 -ml-16 md:-ml-0">
+      <h2 className="text-2xl md:text-3xl font-bold text-center text-purple-800 my-4">
         Dashboard for this Month
       </h2>
-      <div className="flex-1 p-6 grid gap-6 overflow-hidden">
-        {/* Check for loading */}
+      <div className="max-w-7xl mx-auto">
         {!analytics ? (
           <LoadingAnimation message="Fetching data..." />
         ) : (
-          <div className="flex-1 p-6 grid gap-6">
+          <div className="grid gap-6">
             {/* KPI Section */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-green-100 shadow rounded p-4 flex flex-col items-center">
-                <h2 className="text-lg font-semibold text-gray-700">
+                <h2 className="text-md font-semibold text-gray-700">
                   Total Credits
                 </h2>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-xl md:text-2xl font-bold text-green-600">
                   ৳ {analytics.totalCredits.toLocaleString()}
                 </p>
-                <AiOutlineArrowUp className="text-green-600 text-xl" />
+                <AiOutlineArrowUp className="text-green-600 text-lg md:text-xl" />
               </div>
               <div className="bg-red-100 shadow rounded p-4 flex flex-col items-center">
-                <h2 className="text-lg font-semibold text-gray-700">
+                <h2 className="text-md font-semibold text-gray-700">
                   Total Debits
                 </h2>
-                <p className="text-2xl font-bold text-red-600">
+                <p className="text-xl md:text-2xl font-bold text-red-600">
                   ৳ {analytics.totalDebits.toLocaleString()}
                 </p>
-                <AiOutlineArrowDown className="text-red-600 text-xl" />
+                <AiOutlineArrowDown className="text-red-600 text-lg md:text-xl" />
               </div>
               <div className="bg-yellow-100 shadow rounded p-4 flex flex-col items-center">
-                <h2 className="text-lg font-semibold text-gray-700">
+                <h2 className="text-md font-semibold text-gray-700">
                   Total Balance
                 </h2>
-                <p className="text-2xl font-bold text-yellow-600">
+                <p className="text-xl md:text-2xl font-bold text-yellow-600">
                   {(
                     analytics.totalCredits - analytics.totalDebits
                   ).toLocaleString()}
                 </p>
-                <AiOutlineTransaction className="text-yellow-600 text-xl" />
+                <AiOutlineTransaction className="text-yellow-600 text-lg md:text-xl" />
               </div>
               <div className="bg-orange-100 shadow rounded p-4 flex flex-col items-center">
-                <h2 className="text-lg font-semibold text-gray-700">
+                <h2 className="text-md font-semibold text-gray-700">
                   Total Transactions
                 </h2>
-                <p className="text-2xl font-bold text-orange-600">
+                <p className="text-xl md:text-2xl font-bold text-orange-600">
                   {analytics.totalTransactions}
                 </p>
-                <AiOutlineNumber className="text-orange-600 text-xl" />
+                <AiOutlineNumber className="text-orange-600 text-lg md:text-xl" />
               </div>
             </div>
 
             {/* Chart Section */}
-            <div className="flex flex-col xl:flex-row gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               {/* Debit Pie Chart */}
               <div className="bg-white shadow rounded p-4 flex flex-col flex-1">
-                <h2 className="text-lg font-semibold mb-4">
+                <h2 className="text-md font-semibold mb-2 text-center">
                   Debit Breakdown by Category
                 </h2>
-                <div className="flex justify-center h-full items-center">
+                <div className="w-full aspect-[2/1]">
                   <Pie
                     data={debitCategoryData}
-                    options={{ maintainAspectRatio: false }}
+                    options={{ responsive: true, maintainAspectRatio: false }}
                   />
                 </div>
               </div>
-
               {/* Credit Pie Chart */}
               <div className="bg-white shadow rounded p-4 flex flex-col flex-1">
-                <h2 className="text-lg font-semibold mb-4">
+                <h2 className="text-md font-semibold mb-2 text-center">
                   Credit Breakdown by Category
                 </h2>
-                <div className="flex justify-center h-full items-center">
+                <div className="w-full aspect-[2/1]">
                   <Pie
                     data={creditCategoryData}
-                    options={{ maintainAspectRatio: false }}
+                    options={{ responsive: true, maintainAspectRatio: false }}
                   />
                 </div>
               </div>
-
-              {/* Bar Chart */}
-              <div className="bg-white shadow rounded p-4 flex flex-col flex-1">
-                <h2 className="text-lg font-semibold mb-4">
-                  Total Debits vs Credits
-                </h2>
-                <div className="flex justify-center h-full items-center">
-                  <Bar
-                    data={debitCreditComparisonData}
-                    options={{ maintainAspectRatio: false }}
-                  />
-                </div>
+            </div>
+            {/* Bar Chart */}
+            <div className="bg-white shadow rounded max-w-3xl mx-auto flex flex-col">
+              <h2 className="text-md font-semibold mb-2 text-center">
+                Total Debits vs Credits
+              </h2>
+              <div className="w-full aspect-[2/1]">
+                <Bar
+                  data={debitCreditComparisonData}
+                  options={{ responsive: true, maintainAspectRatio: false }}
+                />
               </div>
             </div>
           </div>

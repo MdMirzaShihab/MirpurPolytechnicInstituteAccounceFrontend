@@ -174,7 +174,7 @@ const Transaction = () => {
   };
 
   return (
-    <div className="pl-16">
+    <div className="pl-16 md:pl-0 ">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
       <div className=" space-y-6">
         {/* Confirmation Modal */}
@@ -186,7 +186,7 @@ const Transaction = () => {
           />
         )}
         {/* Transaction Form */}
-        <div className="bg-purple-200 shadow-lg mt-6 shadow-purple-300 rounded-lg p-6">
+        <div className="bg-purple-200 shadow-lg mt-6 max-w-7xl mx-auto shadow-purple-300 rounded-lg p-6">
           <h2 className="text-3xl font-bold text-center text-purple-800 mb-4">
             Create or Edit Transaction
           </h2>
@@ -201,8 +201,8 @@ const Transaction = () => {
         </div>
 
         {/* Today’s Debit and Credit Reports */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-red-100 shadow-lg rounded-lg shadow-red-300 p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
+          <div className="bg-red-100 shadow-lg rounded-lg shadow-red-300 p-6 h-full">
             <TodayCredit
               creditAccounts={creditAccounts}
               totalCredit={totalCredit}
@@ -210,7 +210,7 @@ const Transaction = () => {
               handleEdit={(transaction) => handleEdit(transaction, "credit")}
             />
           </div>
-          <div className="bg-blue-100 shadow-lg rounded-lg shadow-blue-300 p-6">
+          <div className="bg-blue-100 shadow-lg rounded-lg shadow-blue-300 p-6 h-full">
             <TodayDebit
               debitAccounts={debitAccounts}
               totalDebit={totalDebit}

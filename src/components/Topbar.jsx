@@ -16,7 +16,7 @@ const Topbar = () => {
         <Clock />
         <button
         onClick={handleLogout}
-         className="bg-red-600 px-4 py-1 rounded-lg hover:bg-red-700">
+         className="bg-red-600 px-4 py-1 text-white rounded-lg hover:bg-red-700">
           Logout
         </button>
 

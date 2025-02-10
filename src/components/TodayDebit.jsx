@@ -8,13 +8,17 @@ const TodayDebit = ({
 }) => {
   const renderTableRows = (data) =>
     data.map((transaction) => (
-      <tr key={transaction._id} className="bg-white border-b hover:bg-gray-50">
-        <td className="px-6 py-4">{transaction.category.name}</td>
-        <td className="px-6 py-4 text-center">
+      <tr
+        key={transaction._id}
+        className="bg-white border-b hover:bg-gray-50 odd:bg-blue-50">
+        <td className="px-4 py-2">{transaction.category.name}</td>
+        <td className="px-4 py-2 text-center">
           {transaction.paymentMethod.name}
         </td>
-        <td className="px-6 py-4 text-end">{transaction.amount.toLocaleString()}</td>
-        <td className="px-6 py-4 flex justify-center gap-2">
+        <td className="px-4 py-2 text-end">
+          {transaction.amount.toLocaleString()}
+        </td>
+        <td className="px-4 py-2 flex justify-center gap-2">
           <button
             onClick={() => handleEdit(transaction, transaction.type)}
             className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium px-3 py-1 rounded">
@@ -34,20 +38,24 @@ const TodayDebit = ({
       <h2 className="text-2xl font-semibold text-gray-800 mb-4">
         Today's Debits
       </h2>
-      <div className="overflow-x-auto">
+      <div className="overflow-auto h-96">
         <table className="min-w-full text-sm text-left text-gray-600 border rounded-lg">
           <thead className="text-xs uppercase text-white bg-blue-500">
             <tr>
-              <th className="px-6 py-3">Account Head</th>
-              <th className="px-6 py-3 text-center">Payment Method</th>
-              <th className="px-6 py-3 text-center">Amount</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+              <th className="px-4 py-2 sticky top-0 z-10 bg-blue-500">
+                Account Head
+              </th>
+              <th className="px-4 py-2 sticky top-0 z-10 bg-blue-500">
+                Payment Method
+              </th>
+              <th className="px-4 py-2 sticky top-0 z-10 bg-blue-500 text-end">
+                Amount
+              </th>
+              <th className="px-4 py-2 sticky top-0 z-10 bg-blue-500">
+                Actions
+              </th>
             </tr>
           </thead>
-          </table>
-        <div className="flex overflow-y-auto h-64">
-          {/* To make the tbody scrollable */}
-          <table className="w-full table-fixed">
           <tbody>
             {debitAccounts.length > 0 ? (
               renderTableRows(debitAccounts)
@@ -55,27 +63,25 @@ const TodayDebit = ({
               <tr>
                 <td
                   colSpan="4"
-                  className="text-center px-6 py-4 text-gray-500 italic">
+                  className="text-center px-4 py-2 text-gray-500 italic">
                   No debit accounts available
                 </td>
               </tr>
             )}
           </tbody>
-
-          </table>
-        </div>
-        <table className="w-full table-fixed">
           <tfoot>
-            <tr className="bg-gray-100">
-              <td colSpan="2" className="px-6 py-4 font-bold text-gray-700">
+            <tr>
+              <td
+                colSpan="2"
+                className="px-4 py-2 font-bold bg-gray-100 text-gray-700 sticky bottom-0 z-10">
                 Total Debit
               </td>
-              <td className="px-6 py-4 font-bold text-gray-700 text-end">
-              ৳ {totalDebit.toLocaleString()}
+              <td className="px-4 py-2 font-bold bg-gray-100 text-gray-700 sticky bottom-0 z-10 text-end">
+                ৳ {totalDebit.toLocaleString()}
               </td>
               <td
                 colSpan="1"
-                className="text-center py-4 text-gray-500 italic"></td>
+                className="text-center py-2 sticky bottom-0 z-10 bg-gray-100"></td>
             </tr>
           </tfoot>
         </table>
