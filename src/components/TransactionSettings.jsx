@@ -7,7 +7,6 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import TransactionForm from "./TransactionForm";
 import TransactionReportForm from "./TransactionReportForm";
 import { API_BASE_URL } from "../secrets";
-import LoadingAnimation from "./LoadingAnimation";
 
 const TransactionSettings = () => {
   const [filters, setFilters] = useState({

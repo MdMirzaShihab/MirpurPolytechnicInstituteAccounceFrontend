@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Nav from "../components/Nav";
 import TransactionReportForm from "./TransactionReportForm";
 import ReportSummary from "./ReportSummary";
 import TransactionsTable from "./TransactionsTable";
 import { generatePDF } from "../utils/ReportGeneratorPDF";
 import LoadingAnimation from "./LoadingAnimation";
-import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../secrets";
 
 const Report = () => {
-  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     type: "",
     category: "",

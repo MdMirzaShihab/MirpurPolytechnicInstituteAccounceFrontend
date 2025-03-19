@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/mpi.png";
-import Clock from "./Clock";
 
 const Login = () => {
   const [username, setUsername] = useState("");

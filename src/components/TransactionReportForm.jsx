@@ -10,7 +10,6 @@ const TransactionReportForm = ({
   paymentMethods,
   fetchReport,
   loading,
-  error,
   buttonText
 }) => {
   useEffect(() => {
@@ -46,9 +45,11 @@ const TransactionReportForm = ({
     }));
   };
 
-  const categoryOptions = categories.map((category) => ({
-    value: category._id,
-    label: category.name,
+  const categoryOptions = categories
+  .filter((cat) => cat.type === filters.type) // Filter categories based on selected type
+  .map((cat) => ({
+    value: cat._id,
+    label: cat.name,
   }));
 
   const paymentMethodOptions = paymentMethods.map((method) => ({

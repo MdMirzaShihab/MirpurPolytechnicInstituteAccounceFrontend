@@ -19,6 +19,20 @@ export const generatePDF = (
   const headerSpacing = 40;
   const cellHeight = 10;
 
+  // Define table headers **before** using them
+  const headers = [
+    "Date",
+    "Type",
+    "Category",
+    "Payment Method",
+    "Remarks",
+    "Amount",
+  ];
+
+  // Calculate `startX` based on headers **before using it**
+  const totalWidth = headerSpacing * headers.length;
+  const startX = (pageWidth - totalWidth) / 2;
+
   // Add MPI Logo
   const logoWidth = 20,
     logoHeight = 20;
@@ -55,19 +69,26 @@ export const generatePDF = (
   );
   startY += 10;
 
-  startY += 10; // Space before table
+  startY += 10;
+
+  // Calculate Opening Balance
+  const openingBalance = transactionsIncludingOpening - totalBalance;
+
+  // Add Opening Balance Section
+  const openingBalanceLabel = "Opening Balance:";
+  const openingBalanceValue = `${openingBalance.toLocaleString("en-GB")} BDT`;
+
+  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.text(openingBalanceLabel, startX, startY); // Now startX is defined
+
+  doc.setFont("helvetica", "normal").setFontSize(14);
+  doc.text(openingBalanceValue, startX + 50, startY); // Adjust the position
+
+  startY += 5; // Add space before the table
+
+  // Transactions Table
 
   // Table Headers
-  const headers = [
-    "Date",
-    "Type",
-    "Category",
-    "Payment Method",
-    "Remarks",
-    "Amount",
-  ];
-  const totalWidth = headerSpacing * headers.length;
-  const startX = (pageWidth - totalWidth) / 2;
 
   doc.setFont("helvetica", "bold").setFontSize(12);
   headers.forEach((header, index) => {

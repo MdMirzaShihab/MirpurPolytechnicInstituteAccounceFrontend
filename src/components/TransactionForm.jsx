@@ -17,20 +17,22 @@ const TransactionForm = ({
     { value: "debit", label: "Debit" },
   ];
 
-  const categoryOptions = categories.map((cat) => ({
+  const categoryOptions = categories
+  .filter((cat) => cat.type === formData.type) // Filter categories based on selected type
+  .map((cat) => ({
     value: cat._id,
     label: cat.name,
   }));
+
 
   const paymentMethodOptions = paymentMethods.map((method) => ({
     value: method._id,
     label: method.name,
   }));
 
-
   const handleDateChange = (date) => {
     handleInputChange({
-      target: { name: "date", value: format(date, "yyyy-MM-dd") }, 
+      target: { name: "date", value: format(date, "yyyy-MM-dd") },
     });
   };
 
@@ -135,7 +137,7 @@ const TransactionForm = ({
             onChange={handleDateChange} // Update state when the date is changed
             dateFormat="dd/MM/yy" // Display format for users
             className="bg-gray-50 border border-gray-400 text-gray-900 text-sm rounded-lg block w-full p-2 focus:ring-purple-500 focus:border-purple-500"
-            wrapperClassName="w-full" 
+            wrapperClassName="w-full"
             required
           />
         </div>

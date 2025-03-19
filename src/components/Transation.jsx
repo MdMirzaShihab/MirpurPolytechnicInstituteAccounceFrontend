@@ -5,15 +5,10 @@ import "react-toastify/dist/ReactToastify.css";
 import TransactionForm from "./TransactionForm";
 import TodayDebit from "./TodayDebit";
 import TodayCredit from "./TodayCredit";
-import Nav from "../components/Nav";
 import ConfirmationModal from "../components/ConfirmationModal";
-import { useNavigate } from "react-router-dom";
-import Clock from "./Clock";
 import { API_BASE_URL } from "../secrets";
-import DateComponent from "./DateComponent";
 
 const Transaction = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     type: "",
     category: "",
