@@ -6,7 +6,7 @@ import TransactionForm from "./TransactionForm";
 import TodayDebit from "./TodayDebit";
 import TodayCredit from "./TodayCredit";
 import ConfirmationModal from "../components/ConfirmationModal";
-import { API_BASE_URL } from "../secrets";
+import { BASE_URL } from "../secrets";
 
 const Transaction = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ const Transaction = () => {
   const [debitAccounts, setDebitAccounts] = useState([]);
   const [creditAccounts, setCreditAccounts] = useState([]);
   const [totalDebit, setTotalDebit] = useState(0);
-  const [totalCredit, setTotalCredit] = useState(0);
+  const [totalCredit, setTotalCredit] = useState(0);BASE_URL
   const [filterSaveTrigger, setFilterSaveTrigger] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -37,9 +37,9 @@ const Transaction = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoryResponse = await axios.get(`${API_BASE_URL}categories`);
+        const categoryResponse = await axios.get(`${BASE_URL}categories`);
         const paymentMethodResponse = await axios.get(
-          `${API_BASE_URL}payment-methods`
+          `${BASE_URL}payment-methods`
         );
         setCategories(categoryResponse.data);
         setPaymentMethods(paymentMethodResponse.data);
@@ -75,13 +75,13 @@ const Transaction = () => {
     const fetchAllData = async () => {
       await Promise.all([
         fetchData(
-          `${API_BASE_URL}today-reports/debits/today`,
+          `${BASE_URL}today-reports/debits/today`,
           setDebitAccounts,
           setTotalDebit,
           "totalDebit"
         ),
         fetchData(
-          `${API_BASE_URL}today-reports/credits/today`,
+          `${BASE_URL}today-reports/credits/today`,
           setCreditAccounts,
           setTotalCredit,
           "totalCredit"
@@ -94,7 +94,7 @@ const Transaction = () => {
 
   const handleDelete = async () => {
     try {
-      const url = `${API_BASE_URL}today-reports/${deleteTransaction.type}s/today/${deleteTransaction.id}`;
+      const url = `${BASE_URL}today-reports/${deleteTransaction.type}s/today/${deleteTransaction.id}`;
       await axios.delete(url);
       toast.success("Transaction deleted successfully.");
       setFilterSaveTrigger((prev) => prev + 1);
@@ -142,8 +142,8 @@ const Transaction = () => {
     e.preventDefault();
 
     const url = isEditing
-      ? `${API_BASE_URL}today-reports/${formData.type}s/today/${editId}`
-      : `${API_BASE_URL}transactions`;
+      ? `${BASE_URL}today-reports/${formData.type}s/today/${editId}`
+      : `${BASE_URL}transactions`;
     try {
       if (isEditing) {
         await axios.put(url, formData);

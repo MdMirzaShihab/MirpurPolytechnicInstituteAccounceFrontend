@@ -5,7 +5,7 @@ import ReportSummary from "./ReportSummary";
 import TransactionsTable from "./TransactionsTable";
 import { generatePDF } from "../utils/ReportGeneratorPDF";
 import LoadingAnimation from "./LoadingAnimation";
-import { API_BASE_URL } from "../secrets";
+import { BASE_URL } from "../secrets";
 
 const Report = () => {
   const [filters, setFilters] = useState({
@@ -29,10 +29,10 @@ const Report = () => {
   const [loadingTotalBalance, setLoadingTotalBalance] = useState(false);
   const [includeOpeningBalance, setIncludeOpeningBalance] = useState(false);
 
-  const REPORT_API = `${API_BASE_URL}reports`;
-  const TOTAL_BALANCE_API = `${API_BASE_URL}reports/total-balance`;
-  const CATEGORY_API = `${API_BASE_URL}categories`;
-  const PAYMENT_METHOD_API = `${API_BASE_URL}payment-methods`;
+  const REPORT_API = `${BASE_URL}reports`;
+  const TOTAL_BALANCE_API = `${BASE_URL}reports/total-balance`;
+  const CATEGORY_API = `${BASE_URL}categories`;
+  const PAYMENT_METHOD_API = `${BASE_URL}payment-methods`;
 
   useEffect(() => {
     // Fetch categories and payment methods on component mount

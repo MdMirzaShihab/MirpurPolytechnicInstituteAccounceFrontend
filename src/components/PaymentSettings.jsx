@@ -4,7 +4,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmationModal from "../components/ConfirmationModal";
-import { API_BASE_URL } from "../secrets";
+import { BASE_URL } from "../secrets";
 
 const PaymentSettings = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -15,7 +15,7 @@ const PaymentSettings = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentMethodToDelete, setPaymentMethodToDelete] = useState(null);
 
-  const PAYMENT_METHOD_API = `${API_BASE_URL}payment-methods`;
+  const PAYMENT_METHOD_API = `${BASE_URL}payment-methods`;
 
   // Fetch payment methods
   useEffect(() => {

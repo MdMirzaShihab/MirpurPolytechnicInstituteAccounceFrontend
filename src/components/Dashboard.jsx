@@ -17,7 +17,7 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
-import { API_BASE_URL } from "../secrets";
+import { BASE_URL } from "../secrets";
 
 ChartJS.register(
   ArcElement,
@@ -35,7 +35,7 @@ const Dashboard = () => {
     const fetchAnalytics = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}dashboard/analytics/monthly`
+          `${BASE_URL}dashboard/analytics/monthly`
         );
         setAnalytics(response.data);
       } catch (error) {

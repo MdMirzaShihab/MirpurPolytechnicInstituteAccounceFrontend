@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ConfirmationModal from "../components/ConfirmationModal";
 import TransactionForm from "./TransactionForm";
 import TransactionReportForm from "./TransactionReportForm";
-import { API_BASE_URL } from "../secrets";
+import { BASE_URL } from "../secrets";
 
 const TransactionSettings = () => {
   const [filters, setFilters] = useState({
@@ -36,9 +36,9 @@ const TransactionSettings = () => {
     date: "",
   });
 
-  const REPORT_API = `${API_BASE_URL}reports`;
-  const CATEGORY_API = `${API_BASE_URL}categories`;
-  const PAYMENT_METHOD_API = `${API_BASE_URL}payment-methods`;
+  const REPORT_API = `${BASE_URL}reports`;
+  const CATEGORY_API = `${BASE_URL}categories`;
+  const PAYMENT_METHOD_API = `${BASE_URL}payment-methods`;
 
   const fetchReport = async () => {
     setLoading(true);
@@ -109,7 +109,7 @@ const TransactionSettings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = `${API_BASE_URL}transactions/${editId}`;
+      const url = `${BASE_URL}transactions/${editId}`;
       await axios.put(url, formData);
       toast.success("Transaction updated successfully!");
       fetchReport();
@@ -123,7 +123,7 @@ const TransactionSettings = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE_URL}transactions/${deleteTransactionId}`);
+      await axios.delete(`${BASE_URL}transactions/${deleteTransactionId}`);
       toast.success("Transaction deleted successfully.");
       fetchReport();
     } catch (error) {
