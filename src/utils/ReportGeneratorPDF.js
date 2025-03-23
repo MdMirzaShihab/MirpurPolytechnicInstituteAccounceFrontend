@@ -78,11 +78,13 @@ export const generatePDF = (
   const openingBalanceLabel = "Opening Balance:";
   const openingBalanceValue = `${openingBalance.toLocaleString("en-GB")} BDT`;
 
+  const tableRightAlignX = startX + totalWidth - 80;
+
   doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text(openingBalanceLabel, startX, startY); // Now startX is defined
+  doc.text(openingBalanceLabel, tableRightAlignX, startY); // Now startX is defined
 
   doc.setFont("helvetica", "normal").setFontSize(14);
-  doc.text(openingBalanceValue, startX + 50, startY); // Adjust the position
+  doc.text(openingBalanceValue, tableRightAlignX + 50, startY); // Adjust the position
 
   startY += 5; // Add space before the table
 
